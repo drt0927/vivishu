@@ -7,42 +7,43 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'default',
+      redirect: '/dashboard',
+      name: 'Home',
       component: require('@/containers/Container').default,
       children: [
         {
-          path: '/',
-          name: 'dashboard',
+          path: '/dashboard',
+          name: 'Dashboard',
           component: require('@/views/Dashboard').default
         },
         {
           path: '/customers',
-          name: 'customers',
+          name: '고객',
           component: require('@/views/Customers').default
         },
         {
           path: '/stores',
-          name: 'stores',
+          name: '지점',
           component: require('@/views/Stores').default
         },
         {
           path: '/schedules',
-          name: 'schedules',
+          name: '일정',
           component: require('@/views/Schedules').default
         },
         {
           path: '/todos',
-          name: 'todos',
+          name: 'Todo',
           component: require('@/views/Todos').default
         },
         {
           path: '/orders',
-          name: 'orders',
+          name: '주문장',
           component: require('@/views/Orders').default
         },
         {
           path: '/trades',
-          name: 'trades',
+          name: '수평이동',
           component: require('@/views/Trades').default
         }
       ]
