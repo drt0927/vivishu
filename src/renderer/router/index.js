@@ -16,11 +16,18 @@ export default new Router({
           name: 'Dashboard',
           component: require('@/views/Dashboard').default
         },
+        // #region 고객
         {
           path: '/customers',
           name: '고객',
           component: require('@/views/Customers').default
         },
+        {
+          path: '/customers/write',
+          name: '고객 생성',
+          component: require('@/views/Customers/Write').default
+        },
+        // #endregion
         {
           path: '/stores',
           name: '지점',
