@@ -3,31 +3,37 @@ const namespaced = true
 const state = {
   isLogin: false,
   loginDateTime: null,
-  user: {}
+  user: {
+    id: String,
+    name: String
+  }
 }
 
 const getters = {
-  getUser (state) {
-    return state.user
+  isLogin (state) {
+    return state.isLogin && state.user.name
   }
 }
 
 const mutations = {
-  goLogin (state, payload) {
-    state.isLogin = payload.isLogin
-    state.loginDateTime = payload.loginDateTime
-    state.user = payload.user
+  login (state, payload) {
+    state.isLogin = true
+    state.loginDateTime = new Date()
+    state.user = payload
   },
   logout (state) {
     state.isLogin = false
     state.loginDateTime = null
-    state.user = {}
+    state.user = {
+      id: String,
+      name: String
+    }
   }
 }
 
 const actions = {
-  goLogin ({ commit }, payload) {
-    commit('goLogin', payload)
+  login ({ commit }, payload) {
+    commit('login', payload)
   },
   logout ({ commit }) {
     commit('logout')

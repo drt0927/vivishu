@@ -82,36 +82,43 @@ export default {
   },
   methods: {
     joinAccount () {
-      let vm = this
+      // let vm = this
 
-      if (!this.account.pwd || !this.account.pwdConfirm) {
-        alert('비밀번호를 입력해주세요')
-        this.$utils.GetElement(this, 'pwd').focus()
-        return
-      }
+      console.log(this.$db)
+      console.log(this.$db.accounts())
 
-      if (this.account.pwd !== this.account.pwdConfirm) {
-        alert('비밀번호가 일치하지 않습니다.')
-        this.$utils.GetElement(this, 'pwdConfirm').focus()
-        return
-      }
+      // if (!this.account.pwd || !this.account.pwdConfirm) {
+      //   alert('비밀번호를 입력해주세요')
+      //   this.$utils.getElement(this, 'pwd').focus()
+      //   return
+      // }
 
-      this.$db.accounts.insert({
-        id: 'admin',
-        pwd: vm.$utils.EncrytSHA512(vm.account.pwd),
-        role: 99,
-        name: '김수형'
-      }, (err, newDocs) => {
-        if (err) {
-          alert('계정생성에 실패하였습니다.')
-          return
-        }
-        vm.$router.push('login')
-      })
+      // if (this.account.pwd !== this.account.pwdConfirm) {
+      //   alert('비밀번호가 일치하지 않습니다.')
+      //   this.$utils.getElement(this, 'pwdConfirm').focus()
+      //   return
+      // }
+
+      // var account = this.$utils.accountModel.getAccountModel('admin', vm.$utils.encryptSHA512(vm.account.pwd), 99, '김수형')
+      // var account = this.$utils.getAccountModel()
+      // account.id = 'admin'
+      // account.pwd = vm.$utils.encryptSHA512(vm.account.pwd)
+      // account.role = 99
+      // account.name = '김수형'
+      // account.createDate = new Date()
+
+      // this.$utils.insert(this.$db.accounts, account, (err, newDocs) => {
+      //   if (err) {
+      //     alert('계정생성에 실패하였습니다.')
+      //     return
+      //   }
+
+      //   vm.$router.push('login')
+      // })
     }
   },
   mounted () {
-    this.$utils.GetElement(this, 'pwd').focus()
+    this.$utils.getElement(this, 'pwd').focus()
   }
 }
 </script>

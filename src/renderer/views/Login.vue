@@ -13,7 +13,7 @@
                     placeholder="Username"
                     autocomplete="username email"
                     v-model="id"
-                    @keyup.enter="login"
+                    @keyup.enter="tryLogin"
                   >
                     <template #prepend-content><CIcon name="cil-user"/></template>
                   </CInput>
@@ -23,13 +23,13 @@
                     autocomplete="curent-password"
                     v-model="pwd"
                     ref="pwd"
-                    @keyup.enter="login"
+                    @keyup.enter="tryLogin"
                   >
                     <template #prepend-content><CIcon name="cil-lock-locked"/></template>
                   </CInput>
                   <CRow>
                     <CCol col="6" class="text-left">
-                      <CButton color="primary" class="px-4" @click="login">Login</CButton>
+                      <CButton color="primary" class="px-4" @click="tryLogin">Login</CButton>
                     </CCol>
                     <!-- <CCol col="6" class="text-right">
                       <CButton color="link" class="px-0">Forgot password?</CButton>
@@ -72,52 +72,52 @@ export default {
   data () {
     return {
       id: 'admin',
-      pwd: '',
-      salt: ''
+      pwd: ''
     }
   },
   methods: {
     ...mapActions('Auth', [
-      'goLogin',
+      'login',
       'logout'
     ]),
-    login () {
+    tryLogin () {
       let vm = this
-      this.$db.accounts.find({ id: this.id, pwd: this.$utils.EncrytSHA512(this.pwd) }, (err, docs) => {
+      let query = {
+        id: this.id,
+        pwd: this.$utils.encryptSHA512(this.pwd)
+      }
+
+      this.$utils.read(this.$db.accounts, query, (err, docs) => {
         if (err || docs.length < 1) {
           vm.logout()
           alert('로그인에 실패하였습니다.')
-        } else {
-          vm.goLogin({
-            isLogin: true,
-            loginDateTime: new Date(),
-            user: {
-              id: docs[0].id,
-              name: docs[0].name
-            }
-          })
-
-          console.log(vm.$store.state.Auth.isLogin)
-          console.log(vm.$store.state.Auth.loginDateTime)
-          console.log(vm.$store.state.Auth.user)
-          vm.$router.push('/')
+          return
         }
+
+        vm.login({
+          id: docs[0].id,
+          name: docs[0].name
+        })
+
+        vm.$router.push({ path: '/' })
       })
     }
   },
   mounted () {
     let vm = this
-    this.$db.accounts.find({}, (err, docs) => {
+
+    this.$utils.read(this.$db.accounts, {}, (err, docs) => {
       if (err) {
         alert('계정 정보를 조회하지 못했습니다.')
         return
       }
-      console.log(docs)
+
       if (docs.length < 1) {
-        vm.$router.push('register')
+        vm.$router.push({ path: '/register' })
         return
       }
-      this.$utils.GetElement(this, 'pwd').focus()
+
+      vm.$utils.getElement(this, 'pwd').focus()
     })
   }
 }
