@@ -20,7 +20,7 @@ export default new Router({
         {
           path: '/customers',
           name: '고객',
-          component: require('@/views/Customers').default
+          component: require('@/views/Customers/Index').default
         },
         {
           path: '/customers/write',
@@ -71,12 +71,12 @@ export default new Router({
     {
       path: '/login',
       name: 'login',
-      component: require('@/views/Login').default
+      component: require('@/views/Accounts/Login').default
     },
     {
       path: '/register',
       name: 'register',
-      component: require('@/views/Register').default
+      component: require('@/views/Accounts/Register').default
     },
     {
       path: '*',

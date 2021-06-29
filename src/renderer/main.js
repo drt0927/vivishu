@@ -5,8 +5,9 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-import db from './datastore'
-import FilbertUtils from './utils'
+// import db from './datastore'
+import db from './datastore/index'
+import FilbertUtils from './plugin/utils'
 
 import CoreuiVue from '@coreui/vue'
 import { iconsSet as icons } from './assets/icons/icons.js'
