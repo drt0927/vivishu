@@ -21,7 +21,7 @@ export default {
       return ''
     }
     const key = 'TnguddlrkWkddldi1#2@3!'
-    const decipher = this.crypto.createDecipher('aes-256-cbc', key)
+    const decipher = crypto.createDecipher('aes-256-cbc', key)
     let result = decipher.update(payload, 'base64', 'utf8')
     result += decipher.final('utf8')
     return result

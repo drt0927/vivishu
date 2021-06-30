@@ -11,6 +11,7 @@
           label="이름"
           horizontal
           autocomplete="name"
+          ref="name"
           v-model="customer.name"
         />
         <CInput
@@ -45,7 +46,7 @@
             <CSwitch
               class="mr-1"
               color="primary"
-              :checked="customer.isEventAlarm"
+              :checked.sync="customer.isEventAlarm"
             />
           </CCol>
         </CRow>
@@ -57,7 +58,7 @@
       </CForm>
     </CCardBody>
     <CCardFooter>
-      <CButton type="submit" size="sm" color="primary" @click="addCustomer()"><CIcon name="cil-check-circle"/> 생성</CButton>
+      <CButton type="submit" size="sm" color="primary" @click="add()"><CIcon name="cil-check-circle"/> 생성</CButton>
       <CButton type="button" size="sm" color="danger" @click="goList()"><CIcon name="cil-ban"/> 취소</CButton>
     </CCardFooter>
   </CCard>
@@ -81,21 +82,25 @@ export default {
     }
   },
   methods: {
-    addCustomer () {
-      let vm = this
-      this.$db.customers.insert(this.customer, (err, doc) => {
-        if (err) {
-          alert('고객 생성에 실패하였습니다.')
-          return
-        }
+    async add () {
+      let db = this.$db.customers
+      let doc = db.getDocument(this.customer) // doc생성
+      let insert = await db.insert(doc)
+      if (!insert.isSuccess) {
+        console.log(insert.result)
+        alert('고객 생성에 실패하였습니다.')
+        return
+      }
 
-        alert('생성되었습니다.')
-        vm.goList()
-      })
+      alert('생성되었습니다.')
+      this.goList()
     },
     goList () {
       this.$router.push({ path: '/customers' })
     }
+  },
+  mounted () {
+    this.$utils.getElement(this, 'name').focus()
   }
 }
 </script>

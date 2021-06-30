@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Footer from './Footer'
@@ -30,27 +30,18 @@ export default {
     Header,
     Footer
   },
+  computed: {
+    ...mapGetters({
+      isLogin: 'Auth/isLogin'
+    })
+  },
   methods: {
     ...mapActions('Auth', [
       'logout'
     ])
   },
   mounted () {
-    if (!this.$store.state.Auth.isLogin) {
-      this.$router.push('login')
-      return
-    }
-
-    let loginTime = Date.parse(this.$store.state.Auth.loginDateTime)
-    if (isNaN(loginTime)) {
-      return
-    }
-
-    let today = new Date()
-    let loginDate = new Date(loginTime)
-    if (today.getUTCFullYear() !== loginDate.getUTCFullYear() ||
-    today.getUTCMonth() !== loginDate.getUTCMonth() ||
-    today.getUTCDate() !== loginDate.getUTCDate()) {
+    if (!this.isLogin) {
       this.logout()
       this.$router.push('login')
     }

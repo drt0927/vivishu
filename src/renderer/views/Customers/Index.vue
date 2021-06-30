@@ -1,37 +1,37 @@
 <template>
-  <div>
+  <div style="height:1000px;">
     <transition name="fade">
       <CCard>
         <CCardHeader>
           <strong>고객 관리 </strong> <small>검색</small>
           <div class="card-header-actions">
-            <CLink class="card-header-action btn-minimize" @click="bindModel.isCollapsed = !bindModel.isCollapsed">
-              <CIcon :name="`cil-chevron-${bindModel.isCollapsed ? 'bottom' : 'top'}`"/>
+            <CLink class="card-header-action btn-minimize" @click="bind.isCollapsed = !bind.isCollapsed">
+              <CIcon :name="`cil-chevron-${bind.isCollapsed ? 'bottom' : 'top'}`"/>
             </CLink>
           </div>
         </CCardHeader>
-        <CCollapse :show="bindModel.isCollapsed" :duration="400">
+        <CCollapse :show="bind.isCollapsed" :duration="400">
           <CCardBody>
             <CRow>
               <CCol sm="4">
                 <CInput
                   label="이름"
                   placeholder="이름을 입력해 주세요. [like]"
-                  v-model="searchModel.name"
+                  v-model="search.name"
                 />
               </CCol>
               <CCol sm="4">
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="searchModel.contact"
+                  v-model="search.contact"
                 />
               </CCol>
               <CCol sm="4">
                 <CSelect
                   label="행사 알림"
-                  :value.sync="searchModel.isEventAlarm"
-                  :options="bindModel.isEventAlarmOptions"
+                  :value.sync="search.isEventAlarm"
+                  :options="bind.isEventAlarmOptions"
                 />
               </CCol>
             </CRow>
@@ -40,44 +40,60 @@
                 <CInput
                   label="주소 1"
                   placeholder="ex) 경기도 용인시 기흥구 [equal]"
-                  v-model="searchModel.address1"
+                  v-model="search.address1"
                 />
               </CCol>
               <CCol sm="6">
                 <CInput
                   label="주소 2"
                   placeholder="ex) 경기도 용인시 기흥구 [equal]"
-                  v-model="searchModel.address2"
+                  v-model="search.address2"
                 />
               </CCol>
             </CRow>
           </CCardBody>
         </CCollapse>
         <CCardFooter>
-          <CButton type="submit" size="sm" color="success" @click="search"><CIcon name="cil-check-circle"/> 검색</CButton>
+          <CButton type="submit" size="sm" color="success" @click="find"><CIcon name="cil-check-circle"/> 검색</CButton>
           <CButton type="button" size="sm" color="primary" @click="goWrite"><CIcon name="cil-pencil"/> 생성</CButton>
         </CCardFooter>
       </CCard>
     </transition>
 
-    <CDataTable
-      :items="customers"
-      :fields="tableFields"
-      :items-per-page="pagination.perPage"
-    >
-      <!-- <template #status="{item}">
-        <td>
-          <CBadge :color="getBadge(item.status)">{{item.status}}</CBadge>
-        </td>
-      </template> -->
-    </CDataTable>
-    
-    <CPagination
-      :activePage.sync="pagination.currentPage"
-      :pages="pagination.totalRows"
-      size="sm"
-      align="center"
-    />
+    <CCard>
+      <CDataTable
+        :items="list.rows"
+        :fields="list.fields"
+        :items-per-page="list.perPage"
+        hover
+      >
+        <template #address1="{item}">
+          <td class="address">
+            <span v-c-tooltip="{content: item.address1}">
+              {{item.address1}}
+            </span>
+          </td>
+        </template>
+        <template #isEventAlarm="{item}">
+          <td class="is-event-alarm">
+            <CBadge :color="item.isEventAlarm ? 'success' : 'danger'">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge>
+          </td>
+        </template>
+        <!-- <template #description="{item}">
+          <td class="description">
+            <span v-c-tooltip="{content: item.description}">
+              {{item.description}}
+            </span>
+          </td>
+        </template> -->
+      </CDataTable>
+      
+      <CPagination
+        :activePage.sync="list.currentPage"
+        :pages="list.totalPages"
+        align="center"
+      />
+    </CCard>
   </div>
 </template>
 
@@ -86,7 +102,7 @@ export default {
   name: 'customers',
   data () {
     return {
-      bindModel: {
+      bind: {
         isEventAlarmOptions: [
           { value: '', label: '전체' },
           { value: true, label: '알림' },
@@ -94,94 +110,75 @@ export default {
         ],
         isCollapsed: true
       },
-      searchModel: {
+      search: {
         name: '',
         contact: '',
         isEventAlarm: '',
         address1: '',
         address2: ''
       },
-      tableFields: [
-        { key: 'name', label: '이름' },
-        { key: 'contact', label: '연락처' },
-        { key: 'address1', label: '주소1' },
-        { key: 'address2', label: '주소2' },
-        { key: 'isEventAlarm', label: '행사알림' },
-        { key: 'description', label: '설명' }
-      ],
-      customers: [],
-      pagination: {
+      list: {
+        rows: [],
+        fields: [
+          { key: 'name', label: '이름', _classes: 'name' },
+          { key: 'contact', label: '연락처', _classes: 'contact' },
+          { key: 'address1', label: '주소1', _classes: 'address' },
+          { key: 'isEventAlarm', label: '행사알림', _classes: 'is-event-alarm' }
+          // { key: 'description', label: '설명', _classes: 'description' }
+        ],
         currentPage: 1,
         perPage: 5,
-        totalRows: 0,
-        isBusy: false
+        totalPages: 0
       }
     }
   },
   watch: {
-    'pagination.currentPage': function () {
-      this.search()
+    'list.currentPage': function () {
+      this.find()
     }
   },
   methods: {
-    search () {
-      let vm = this
-
-      let query = {}
-
-      if (vm.searchModel.name) {
-        query.name = new RegExp(vm.searchModel.name)
-      }
-
-      if (vm.searchModel.contact) {
-        query.contact = new RegExp(vm.searchModel.contact)
-      }
-
-      if (vm.searchModel.isEventAlarm !== '') {
-        query.isEventAlarm = vm.searchModel.isEventAlarm
-      }
-
-      if (vm.searchModel.address1) {
-        query.address1 = new RegExp(vm.searchModel.address1)
-      }
-
-      if (vm.searchModel.address2) {
-        query.address2 = new RegExp(vm.searchModel.address2)
-      }
-
-      vm.$db.customers.count(query, (cntErr, count) => {
-        console.log(count)
-        if (cntErr) {
-          vm.pagination.isBusy = false
-        }
-
-        vm.pagination.totalRows = Math.ceil(count / vm.pagination.perPage)
-      })
-
-      this.$db.customers.find(query)
-        .sort({ name: 1 })
-        .skip((vm.pagination.currentPage - 1) * vm.pagination.perPage)
-        .limit(vm.pagination.perPage)
-        .exec((err, rows) => {
-          if (err) {
-            vm.pagination.isBusy = false
-            return
-          }
-          vm.pagination.isBusy = false
-          vm.customers = rows
-          console.log(rows)
-        })
+    async find () {
+      await this.$db.customers.find(
+        this.search
+        , { name: 1 }
+        , this.list)
     },
     goWrite () {
       this.$router.push({ path: '/customers/write' })
     }
   },
   mounted () {
-    this.search()
+    this.find()
   }
 }
 </script>
 
 <style>
-
+.name {
+  min-width: 80px;
+}
+.contact {
+  min-width: 100px;
+}
+.is-event-alarm {
+  min-width: 80px;
+}
+.address span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 95%;
+}
+.description {
+  min-width: 50px
+}
+.description span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 50px;
+}
 </style>

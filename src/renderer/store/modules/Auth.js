@@ -11,6 +11,19 @@ const state = {
 
 const getters = {
   isLogin (state) {
+    let loginTime = Date.parse(state.loginDateTime)
+    if (isNaN(loginTime)) {
+      return false
+    }
+
+    let today = new Date()
+    let loginDate = new Date(loginTime)
+    if (today.getUTCFullYear() !== loginDate.getUTCFullYear() ||
+    today.getUTCMonth() !== loginDate.getUTCMonth() ||
+    today.getUTCDate() !== loginDate.getUTCDate()) {
+      return false
+    }
+
     return state.isLogin && state.user.name
   }
 }

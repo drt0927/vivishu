@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'login',
@@ -52,6 +52,11 @@ export default {
       id: 'admin',
       pwd: ''
     }
+  },
+  computed: {
+    ...mapGetters({
+      isLogin: 'Auth/isLogin'
+    })
   },
   methods: {
     ...mapActions('Auth', [
@@ -80,14 +85,16 @@ export default {
     }
   },
   async mounted () {
-    let vm = this
-
-    var totalCnt = await this.$db.accounts.count()
-    if (totalCnt < 1) {
-      vm.$router.push({ path: '/register' })
+    if (this.isLogin) {
+      this.$router.push({ path: '/' })
     }
 
-    vm.$utils.getElement(this, 'pwd').focus()
+    let totalCnt = await this.$db.accounts.count()
+    if (totalCnt < 1) {
+      this.$router.push({ path: '/register' })
+    }
+
+    this.$utils.getElement(this, 'pwd').focus()
   }
 }
 </script>
