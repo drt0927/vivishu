@@ -19,13 +19,26 @@ export default new Router({
         // #region 고객
         {
           path: '/customers',
+          redirect: '/customers',
           name: '고객',
-          component: require('@/views/Customers/Index').default
-        },
-        {
-          path: '/customers/write',
-          name: '고객 생성',
-          component: require('@/views/Customers/Write').default
+          component: require('@/views/Customers/Customers').default,
+          children: [
+            {
+              path: '/customers',
+              name: '고객 목록',
+              component: require('@/views/Customers/Index').default
+            },
+            {
+              path: '/customers/write',
+              name: '고객 생성',
+              component: require('@/views/Customers/Write').default
+            },
+            {
+              path: '/customers/:id',
+              name: '고객 상세',
+              component: require('@/views/Customers/Detail').default
+            }
+          ]
         },
         // #endregion
         {

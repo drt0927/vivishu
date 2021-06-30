@@ -13,30 +13,23 @@
           autocomplete="name"
           ref="name"
           v-model="customer.name"
+          @keyup.enter="add"
         />
         <CInput
           label="연락처"
           description="고객의 연락처를 입력해 주세요."
           horizontal
+          ref="contact"
           v-model="customer.contact"
+          @keyup.enter="add"
         />
         <CInput
-          label="주소 1"
+          label="주소"
           description="주소를 입력해 주세요."
           horizontal
-          v-model="customer.address1"
-        />
-        <CInput
-          label="주소 2"
-          description="주소를 입력해 주세요."
-          horizontal
-          v-model="customer.address2"
-        />
-        <CInput
-          label="주소 3"
-          description="주소를 입력해 주세요."
-          horizontal
-          v-model="customer.address3"
+          ref="address"
+          v-model="customer.address"
+          @keyup.enter="add"
         />
         <CRow form class="form-group">
           <CCol tag="label" sm="3" class="col-form-label">
@@ -47,13 +40,16 @@
               class="mr-1"
               color="primary"
               :checked.sync="customer.isEventAlarm"
+              @keyup.enter="add"
             />
           </CCol>
         </CRow>
         <CInput
           label="설명"
           horizontal
+          ref="description"
           v-model="customer.description"
+          @keyup.enter="add"
         />
       </CForm>
     </CCardBody>
@@ -70,22 +66,13 @@ export default {
   name: 'customers-write',
   data () {
     return {
-      customer: {
-        name: '',
-        contact: '',
-        address1: '',
-        address2: '',
-        address3: '',
-        isEventAlarm: false,
-        description: ''
-      }
+      customer: this.$db.customers.getNewDocument()
     }
   },
   methods: {
     async add () {
       let db = this.$db.customers
-      let doc = db.getDocument(this.customer) // doc생성
-      let insert = await db.insert(doc)
+      let insert = await db.insert(this.customer) // insert
       if (!insert.isSuccess) {
         console.log(insert.result)
         alert('고객 생성에 실패하였습니다.')

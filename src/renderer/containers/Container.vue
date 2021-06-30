@@ -40,7 +40,12 @@ export default {
       'logout'
     ])
   },
-  mounted () {
+  async mounted () {
+    let totalCnt = await this.$db.accounts.count()
+    if (totalCnt < 1) {
+      this.$router.push({ path: '/register' })
+    }
+
     if (!this.isLogin) {
       this.logout()
       this.$router.push('login')

@@ -12,7 +12,7 @@
                   <CInput
                     placeholder="Username"
                     autocomplete="username email"
-                    v-model="id"
+                    v-model="account.id"
                     @keyup.enter="tryLogin"
                   >
                     <template #prepend-content><CIcon name="cil-user"/></template>
@@ -21,7 +21,7 @@
                     placeholder="Password"
                     type="password"
                     autocomplete="curent-password"
-                    v-model="pwd"
+                    v-model="account.pwd"
                     ref="pwd"
                     @keyup.enter="tryLogin"
                   >
@@ -49,8 +49,10 @@ export default {
   name: 'login',
   data () {
     return {
-      id: 'admin',
-      pwd: ''
+      account: {
+        id: 'admin',
+        pwd: ''
+      }
     }
   },
   computed: {
@@ -64,12 +66,12 @@ export default {
       'logout'
     ]),
     async tryLogin () {
-      let query = {
-        id: this.id,
-        pwd: this.$utils.encryptSHA512(this.pwd)
+      var db = this.$db.accounts
+      if (!db.validLogin(this, this.account)) {
+        return
       }
 
-      let find = await this.$db.accounts.find(query)
+      let find = await this.$db.accounts.findOne(this.account)
       if (!find.isSuccess) {
         this.logout()
         alert(find.result)
@@ -81,12 +83,15 @@ export default {
         name: find.result[0].name
       })
 
+      this.goMain()
+    },
+    goMain () {
       this.$router.push({ path: '/' })
     }
   },
   async mounted () {
     if (this.isLogin) {
-      this.$router.push({ path: '/' })
+      this.goMain()
     }
 
     let totalCnt = await this.$db.accounts.count()

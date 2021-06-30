@@ -53,42 +53,32 @@ export default {
   name: 'register',
   data () {
     return {
-      account: {
-        id: 'admin',
-        pwd: '',
-        pwdConfirm: '',
-        role: 99,
-        name: '김수형'
-      }
+      account: this.$db.accounts.getNewDocument({ id: 'admin', name: '김수형', role: 99 })
     }
   },
   methods: {
     async join () {
       let db = this.$db.accounts
-
-      let valid = db.valid(this.account)
-      if (valid.code !== db.resultCodes.SUCCESS_CODE) {
-        alert(valid.msg)
-        if (valid.result === db.resultCodes.VALID_EMPTY_PASSWORD) {
-          this.$utils.getElement(this, 'pwd').focus()
-        } else if (valid.result === db.resultCodes.VALID_CONFIRM) {
-          this.$utils.getElement(this, 'pwdConfirm').focus()
-        }
+      if (!db.validJoin(this, this.account)) {
         return
       }
 
-      let doc = db.getDocument(this.account) // doc생성
-      let insert = await db.insert(doc) // doc insert
-
+      let insert = await db.insert(this.account) // insert
       if (!insert.isSuccess) {
-        alert(insert.result)
+        console.log(insert.result)
+        alert('계정 생성에 실패하였습니다.')
         return
       }
 
       this.$router.push({ path: '/login' })
     }
   },
-  mounted () {
+  async mounted () {
+    let totalCnt = await this.$db.accounts.count()
+    if (totalCnt > 0) {
+      this.$router.push({ path: '/login' })
+    }
+
     this.$utils.getElement(this, 'pwd').focus()
   }
 }

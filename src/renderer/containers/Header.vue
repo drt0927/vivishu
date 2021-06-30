@@ -68,6 +68,9 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 
+.c-header {
+  background: #F2D0E2;
+}
 .c-header .c-header-brand {
   font-family: 'Lato', sans-serif;
   font-size: 35px;

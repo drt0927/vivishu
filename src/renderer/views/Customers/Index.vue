@@ -1,5 +1,5 @@
 <template>
-  <div style="height:1000px;">
+  <div style="min-height:1000px;">
     <transition name="fade">
       <CCard>
         <CCardHeader>
@@ -13,41 +13,38 @@
         <CCollapse :show="bind.isCollapsed" :duration="400">
           <CCardBody>
             <CRow>
-              <CCol sm="4">
+              <CCol sm="6">
                 <CInput
                   label="이름"
                   placeholder="이름을 입력해 주세요. [like]"
                   v-model="search.name"
+                  @keyup.enter="find"
                 />
               </CCol>
-              <CCol sm="4">
+              <CCol sm="6">
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [equal]"
                   v-model="search.contact"
-                />
-              </CCol>
-              <CCol sm="4">
-                <CSelect
-                  label="행사 알림"
-                  :value.sync="search.isEventAlarm"
-                  :options="bind.isEventAlarmOptions"
+                  @keyup.enter="find"
                 />
               </CCol>
             </CRow>
             <CRow>
               <CCol sm="6">
-                <CInput
-                  label="주소 1"
-                  placeholder="ex) 경기도 용인시 기흥구 [equal]"
-                  v-model="search.address1"
+                <CSelect
+                  label="행사 알림"
+                  :value.sync="search.isEventAlarm"
+                  :options="bind.isEventAlarmOptions"
+                  @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
                 <CInput
-                  label="주소 2"
-                  placeholder="ex) 경기도 용인시 기흥구 [equal]"
-                  v-model="search.address2"
+                  label="설명"
+                  placeholder="설명을 입력해 주세요. [like]"
+                  v-model="search.description"
+                  @keyup.enter="find"
                 />
               </CCol>
             </CRow>
@@ -67,25 +64,31 @@
         :items-per-page="list.perPage"
         hover
       >
-        <template #address1="{item}">
+        <template #contact="{item}">
           <td class="address">
-            <span v-c-tooltip="{content: item.address1}">
-              {{item.address1}}
+            <span v-c-tooltip="{content: item.address}">
+              {{item.contact}}
             </span>
           </td>
         </template>
         <template #isEventAlarm="{item}">
           <td class="is-event-alarm">
-            <CBadge :color="item.isEventAlarm ? 'success' : 'danger'">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge>
+            <h5><CBadge :color="item.isEventAlarm ? 'success' : 'danger'" v-c-tooltip="{content: item.description}">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge></h5>
           </td>
         </template>
-        <!-- <template #description="{item}">
-          <td class="description">
-            <span v-c-tooltip="{content: item.description}">
-              {{item.description}}
-            </span>
+        <template #btnDetail="{item}">
+          <td>
+            <CButton
+            color="primary"
+            variant="outline"
+            square
+            size="sm"
+            @click="goDetail(item._id)"
+          >
+            상세
+          </CButton>
           </td>
-        </template> -->
+        </template>
       </CDataTable>
       
       <CPagination
@@ -114,20 +117,20 @@ export default {
         name: '',
         contact: '',
         isEventAlarm: '',
-        address1: '',
-        address2: ''
+        description: ''
       },
       list: {
         rows: [],
         fields: [
           { key: 'name', label: '이름', _classes: 'name' },
           { key: 'contact', label: '연락처', _classes: 'contact' },
-          { key: 'address1', label: '주소1', _classes: 'address' },
-          { key: 'isEventAlarm', label: '행사알림', _classes: 'is-event-alarm' }
+          // { key: 'address1', label: '주소', _classes: 'address' },
+          { key: 'isEventAlarm', label: '행사알림', _classes: 'is-event-alarm' },
+          { key: 'btnDetail', label: '상세' }
           // { key: 'description', label: '설명', _classes: 'description' }
         ],
         currentPage: 1,
-        perPage: 5,
+        perPage: 15,
         totalPages: 0
       }
     }
@@ -139,13 +142,17 @@ export default {
   },
   methods: {
     async find () {
-      await this.$db.customers.find(
+      let db = this.$db.customers
+      await db.find(
         this.search
         , { name: 1 }
         , this.list)
     },
     goWrite () {
       this.$router.push({ path: '/customers/write' })
+    },
+    goDetail (id) {
+      this.$router.push({ path: `/customers/${id}` })
     }
   },
   mounted () {
