@@ -34,6 +34,11 @@ export default new Router({
               component: require('@/views/Customers/Write').default
             },
             {
+              path: '/customers/write/:id',
+              name: '고객 수정',
+              component: require('@/views/Customers/Write').default
+            },
+            {
               path: '/customers/:id',
               name: '고객 상세',
               component: require('@/views/Customers/Detail').default

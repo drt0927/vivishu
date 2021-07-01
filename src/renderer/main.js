@@ -11,7 +11,10 @@ import FilbertUtils from './plugin/utils'
 
 import CoreuiVue from '@coreui/vue'
 import { iconsSet as icons } from './assets/icons/icons.js'
+import VueSweetalert2 from 'vue-sweetalert2'
+import VueDaumPostcode from 'vue-daum-postcode'
 
+import moment from 'moment'
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 // import 'bootstrap/dist/css/bootstrap.css'
@@ -21,11 +24,15 @@ if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 Vue.config.performance = true
+
 Vue.prototype.$db = db
+moment.locale('ko')
+Vue.prototype.$moment = moment
 
 Vue.use(CoreuiVue)
 Vue.use(FilbertUtils)
-
+Vue.use(VueSweetalert2)
+Vue.use(VueDaumPostcode)
 // Vue.use(BootstrapVue)
 // Vue.use(IconsPlugin)
 /* eslint-disable no-new */

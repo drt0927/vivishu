@@ -16,12 +16,14 @@ export default class NedbHelper {
     // 암호화 필드
     this.encryptFields.forEach(field => {
       if (field.type === enums.EncryptType.AES && doc[field.key] !== undefined) {
-        newDoc[field.key] = utils.encryptAES256(newDoc[field.key])
+        newDoc[field.key] = utils.crypt.encryptAES256(newDoc[field.key])
       } else if (field.type === enums.EncryptType.SHA && doc[field.key] !== undefined) {
-        newDoc[field.key] = utils.encryptSHA512(newDoc[field.key])
+        newDoc[field.key] = utils.crypt.encryptSHA512(newDoc[field.key])
       }
     })
-    newDoc.crateDate = new Date()
+    if (!newDoc.crateDate) {
+      newDoc.crateDate = new Date()
+    }
 
     // 저장하면 안되는 필드 제거
     this.ignoreFields.forEach(field => {
@@ -39,9 +41,9 @@ export default class NedbHelper {
     // 암호화 필드
     this.encryptFields.forEach(field => {
       if (field.type === enums.EncryptType.AES && doc[field.key] !== undefined) {
-        doc[field.key] = utils.encryptAES256(doc[field.key])
+        doc[field.key] = utils.crypt.encryptAES256(doc[field.key])
       } else if (field.type === enums.EncryptType.SHA && doc[field.key] !== undefined) {
-        doc[field.key] = utils.encryptSHA512(doc[field.key])
+        doc[field.key] = utils.crypt.encryptSHA512(doc[field.key])
       }
     })
 
@@ -79,7 +81,7 @@ export default class NedbHelper {
     })
   }
 
-  async delete (id) {
+  async remove (id) {
     return new Promise((resolve) => {
       this.db.remove({ _id: id }, {}, (err, numRemoved) => {
         if (err) {
@@ -99,7 +101,12 @@ export default class NedbHelper {
 
   async update (id, doc) {
     return new Promise((resolve) => {
-      this.db.update({ _id: id }, { $set: doc }, {}, (err, numUpdated) => {
+      let newDoc = this.getDocument(doc)
+      if (newDoc === undefined) {
+        return
+      }
+
+      this.db.update({ _id: id }, { $set: newDoc }, {}, (err, numUpdated) => {
         if (err) {
           resolve({
             isSuccess: false,
@@ -139,7 +146,7 @@ export default class NedbHelper {
           docs.forEach(value => {
             helper.encryptFields.forEach(field => {
               if (field.type === enums.EncryptType.AES && value[field.key] !== undefined) {
-                value[field.key] = utils.decryptAES256(value[field.key])
+                value[field.key] = utils.crypt.decryptAES256(value[field.key])
               }
             })
           })
@@ -175,7 +182,7 @@ export default class NedbHelper {
           docs.forEach(value => {
             helper.encryptFields.forEach(field => {
               if (field.type === enums.EncryptType.AES && value[field.key] !== undefined) {
-                value[field.key] = utils.decryptAES256(value[field.key])
+                value[field.key] = utils.crypt.decryptAES256(value[field.key])
               }
             })
           })

@@ -12,5 +12,6 @@
 
 <style lang="scss">
   @import '~@coreui/coreui/scss/coreui';
+  @import '~sweetalert2/dist/sweetalert2.min.css'
   /* CSS */
 </style>

@@ -30,27 +30,26 @@ class Account extends NedbHelper {
       pwd: '',
       pwdConfirm: '',
       role: 0,
-      name: '',
-      createDate: new Date()
+      name: ''
     }, defaultObject)
   }
 
   validJoin (vm, doc) {
     if (!doc.id) {
       alert(`[아이디]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'id').focus()
+      utils.common.getElement(vm, 'id').focus()
       return false
     }
 
     if (!doc.pwd) {
       alert(`[비밀번호]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'pwd').focus()
+      utils.common.getElement(vm, 'pwd').focus()
       return false
     }
 
     if (!doc.pwdConfirm) {
       alert(`[비밀번호 확인]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'pwdConfirm').focus()
+      utils.common.getElement(vm, 'pwdConfirm').focus()
       return false
     }
 
@@ -65,13 +64,13 @@ class Account extends NedbHelper {
   validLogin (vm, doc) {
     if (!doc.id) {
       alert(`[아이디]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'id').focus()
+      utils.common.getElement(vm, 'id').focus()
       return false
     }
 
     if (!doc.pwd) {
       alert(`[비밀번호]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'pwd').focus()
+      utils.common.getElement(vm, 'pwd').focus()
       return false
     }
 

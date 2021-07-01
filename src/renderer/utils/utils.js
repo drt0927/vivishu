@@ -1,59 +1,115 @@
 import crypto from 'crypto'
 
-export default {
+const common = {
   getElement (vm, ref) {
     return vm.$refs[ref].$el.getElementsByTagName('input')[0]
-  },
+  }
+}
 
-  // #region  " 암호화 "
+const masking = {
+  checkNull (str) {
+    if (typeof str === 'undefined' || str === null || str === '') {
+      return true
+    } else {
+      return false
+    }
+  },
+  phone (str) {
+    let originStr = str
+    let phoneStr
+    let maskingStr
+    if (this.checkNull(originStr) === true) {
+      return originStr
+    }
+
+    if (originStr.toString().split('-').length !== 3) {
+      // 1) -가 없는 경우
+      phoneStr = originStr.length < 11 ? originStr.match(/\d{10}/gi) : originStr.match(/\d{11}/gi)
+      if (this.checkNull(phoneStr) === true) {
+        return originStr
+      }
+
+      if (originStr.length < 11) {
+        // 1.1) 0110000000
+        maskingStr = originStr.toString().replace(phoneStr, phoneStr.toString().replace(/(\d{3})(\d{3})(\d{4})/gi, '$1***$3'))
+      } else {
+        // 1.2) 01000000000
+        maskingStr = originStr.toString().replace(phoneStr, phoneStr.toString().replace(/(\d{3})(\d{4})(\d{4})/gi, '$1****$3'))
+      }
+    } else {
+      // 2) -가 있는 경우
+      phoneStr = originStr.match(/\d{2,3}-\d{3,4}-\d{4}/gi)
+      if (this.checkNull(phoneStr) === true) {
+        return originStr
+      }
+
+      if (/-[0-9]{3}-/.test(phoneStr)) {
+        // 2.1) 00-000-0000
+        maskingStr = originStr.toString().replace(phoneStr, phoneStr.toString().replace(/-[0-9]{3}-/g, '-***-'))
+      } else if (/-[0-9]{4}-/.test(phoneStr)) {
+        // 2.2) 00-0000-0000
+        maskingStr = originStr.toString().replace(phoneStr, phoneStr.toString().replace(/-[0-9]{4}-/g, '-****-'))
+      }
+    }
+    return maskingStr
+  }
+}
+
+const check = {
+  phone (str) {
+    var regExp = /(01[0|1|6|9|7])(\d{3}|\d{4})(\d{4}$)/g
+    var result = regExp.exec(str)
+    if (!result) {
+      return false
+    }
+    return true
+  }
+}
+
+const crypt = {
   encryptAES256 (payload) {
-    if (!payload) {
+    try {
+      if (!payload) {
+        return ''
+      }
+      const key = 'TnguddlrkWkddldi1#2@3!'
+      const cipher = crypto.createCipher('aes-256-cbc', key)
+      let result = cipher.update(payload, 'utf8', 'base64')
+      result += cipher.final('base64')
+      return result
+    } catch (ex) {
+      console.log(ex)
       return ''
     }
-    const key = 'TnguddlrkWkddldi1#2@3!'
-    const cipher = crypto.createCipher('aes-256-cbc', key)
-    let result = cipher.update(payload, 'utf8', 'base64')
-    result += cipher.final('base64')
-    return result
   },
   decryptAES256 (payload) {
-    if (!payload) {
+    try {
+      if (!payload) {
+        return ''
+      }
+      const key = 'TnguddlrkWkddldi1#2@3!'
+      const decipher = crypto.createDecipher('aes-256-cbc', key)
+      let result = decipher.update(payload, 'base64', 'utf8')
+      result += decipher.final('utf8')
+      return result
+    } catch (ex) {
+      console.log(ex)
       return ''
     }
-    const key = 'TnguddlrkWkddldi1#2@3!'
-    const decipher = crypto.createDecipher('aes-256-cbc', key)
-    let result = decipher.update(payload, 'base64', 'utf8')
-    result += decipher.final('utf8')
-    return result
   },
   encryptSHA512 (payload) {
-    const salt = 'rnldudnsTnguddl)3(2*1'
-    return crypto.pbkdf2Sync(payload, salt, 100000, 64, 'sha512').toString('base64')
-  },
-  // #endregion
-
-  // #region " 구조 정의 "
-  getCustomerModel () {
-    // 고객 정보
-    return {
-      // 이름
-      name: String,
-      // 연락처
-      contact: String,
-      // 주소1
-      address1: String,
-      // 주소2
-      address2: String,
-      // 주소3
-      address3: String,
-      // 행사알림
-      isEventAlarm: Boolean,
-      // 설명
-      description: String,
-      // 생성일
-      createDate: Date
+    try {
+      const salt = 'rnldudnsTnguddl)3(2*1'
+      return crypto.pbkdf2Sync(payload, salt, 100000, 64, 'sha512').toString('base64')
+    } catch (ex) {
+      console.log(ex)
+      return ''
     }
-  },
+  }
+}
+
+const structures = {
+  // #region " 구조 정의 "
   getOrderModel () {
     // 주문 정보
     return {
@@ -157,19 +213,14 @@ export default {
       // 글자색
       fontColor: String
     }
-  },
-  // #endregion
-
-  // #region " DB Wrapper "
-  read (db, query, callback) {
-    db.find(query, (err, docs) => {
-      callback(err, docs)
-    })
-  },
-  insert (db, doc, callback) {
-    db.insert(doc, (err, newDocs) => {
-      callback(err, newDocs)
-    })
   }
   // #endregion
+}
+
+export default {
+  common,
+  masking,
+  check,
+  crypt,
+  structures
 }

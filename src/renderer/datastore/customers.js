@@ -27,21 +27,26 @@ class Customer extends NedbHelper {
       contact: '',
       address: '',
       isEventAlarm: false,
-      description: '',
-      createDate: new Date()
+      description: ''
     }, defaultObject)
   }
 
   valid (vm, doc) {
     if (!doc.name) {
       alert(`[이름]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'name').focus()
+      utils.common.getElement(vm, 'name').focus()
       return false
     }
 
     if (!doc.contact) {
       alert(`[연락처]은(는) 필수 값 입니다.`)
-      utils.getElement(vm, 'contact').focus()
+      utils.common.getElement(vm, 'contact').focus()
+      return false
+    }
+
+    if (!utils.check.phone(doc.contact)) {
+      alert('[연락처] 형식이 올바르지 않습니다. 숫자 10~11자리 입니다.')
+      utils.common.getElement(vm, 'contact').focus()
       return false
     }
 

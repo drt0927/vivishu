@@ -2,7 +2,7 @@
 <div>
   <CCard>
     <CCardHeader>
-      <strong>고객 관리</strong> 생성
+      <strong>고객 관리</strong> {{id ? '수정' : '생성'}}
     </CCardHeader>
     <CCardBody>
       <CForm>
@@ -13,7 +13,7 @@
           autocomplete="name"
           ref="name"
           v-model="customer.name"
-          @keyup.enter="add"
+          @keyup.enter="excute"
         />
         <CInput
           label="연락처"
@@ -21,7 +21,7 @@
           horizontal
           ref="contact"
           v-model="customer.contact"
-          @keyup.enter="add"
+          @keyup.enter="excute"
         />
         <CInput
           label="주소"
@@ -29,8 +29,12 @@
           horizontal
           ref="address"
           v-model="customer.address"
-          @keyup.enter="add"
-        />
+          @keyup.enter="excute"
+        >
+          <template #append>
+            <CButton type="button" color="info" @click="addressSearch">검색</CButton>
+          </template>
+        </CInput>
         <CRow form class="form-group">
           <CCol tag="label" sm="3" class="col-form-label">
             행사알림
@@ -40,7 +44,7 @@
               class="mr-1"
               color="primary"
               :checked.sync="customer.isEventAlarm"
-              @keyup.enter="add"
+              @keyup.enter="excute"
             />
           </CCol>
         </CRow>
@@ -49,15 +53,21 @@
           horizontal
           ref="description"
           v-model="customer.description"
-          @keyup.enter="add"
+          @keyup.enter="excute"
         />
       </CForm>
     </CCardBody>
     <CCardFooter>
-      <CButton type="submit" size="sm" color="primary" @click="add()"><CIcon name="cil-check-circle"/> 생성</CButton>
-      <CButton type="button" size="sm" color="danger" @click="goList()"><CIcon name="cil-ban"/> 취소</CButton>
+      <CButton type="submit" size="sm" color="primary" @click="excute">{{id ? '수정' : '생성'}}</CButton>
+      <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
     </CCardFooter>
   </CCard>
+  <div ref="daum-area" class="daum-layer-background">
+    <div class="daum-wrapper">
+      <CIcon class="daum-layer-close" @click="addressSearchClose"></CIcon>
+      <vue-daum-postcode style="margin-top:25px;" @complete="addressSearchComplete" />
+    </div>
+  </div>
 </div>
 </template>
 
@@ -66,28 +76,100 @@ export default {
   name: 'customers-write',
   data () {
     return {
+      id: this.$route.params.id,
+      db: this.$db.customers,
       customer: this.$db.customers.getNewDocument()
     }
   },
   methods: {
+    async excute () {
+      if (this.id) {
+        await this.modify()
+      } else {
+        await this.add()
+      }
+    },
     async add () {
-      let db = this.$db.customers
-      let insert = await db.insert(this.customer) // insert
-      if (!insert.isSuccess) {
-        console.log(insert.result)
-        alert('고객 생성에 실패하였습니다.')
+      if (!this.db.valid(this, this.customer)) {
         return
       }
 
-      alert('생성되었습니다.')
+      let insert = await this.db.insert(this.customer) // insert
+      if (!insert.isSuccess) {
+        console.log(insert.result)
+        alert('고객 정보 생성을 실패하였습니다.')
+        return
+      }
+
+      this.$swal({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        icon: 'success',
+        title: '고객 정보 생성 완료'
+      })
+
+      this.goList()
+    },
+    async modify () {
+      if (!this.db.valid(this, this.customer)) {
+        return
+      }
+
+      let update = await this.db.update(this.id, this.customer)
+      if (!update.isSuccess) {
+        alert('고객 정보 수정을 실패하였습니다.')
+        return
+      }
+
+      this.$swal({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        icon: 'success',
+        title: '고객 정보 수정 완료'
+      })
+
       this.goList()
     },
     goList () {
-      this.$router.push({ path: '/customers' })
+      if (this.id) {
+        this.$router.push({ path: `/customers/${this.id}` })
+      } else {
+        this.$router.push({ path: '/customers' })
+      }
+    },
+    addressSearch () {
+      this.$refs['daum-area'].style.display = 'block'
+    },
+    addressSearchClose () {
+      this.$refs['daum-area'].style.display = 'none'
+    },
+    addressSearchComplete (addr) {
+      let resultAddr = addr.roadAddress
+      if (addr.buildingName) {
+        resultAddr += ` (${addr.buildingName})`
+      }
+      this.customer.address = resultAddr
+      this.addressSearchClose()
     }
   },
-  mounted () {
-    this.$utils.getElement(this, 'name').focus()
+  async mounted () {
+    this.$utils.common.getElement(this, 'name').focus()
+
+    if (this.id) {
+      let find = await this.db.findOne({ _id: this.id })
+      if (!find.isSuccess) {
+        alert(find.result)
+        return
+      }
+
+      this.customer = find.result[0]
+    }
   }
 }
 </script>

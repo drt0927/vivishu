@@ -79,7 +79,7 @@ export default {
       this.$router.push({ path: '/login' })
     }
 
-    this.$utils.getElement(this, 'pwd').focus()
+    this.$utils.common.getElement(this, 'pwd').focus()
   }
 }
 </script>

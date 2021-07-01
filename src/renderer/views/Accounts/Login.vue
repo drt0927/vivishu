@@ -99,7 +99,7 @@ export default {
       this.$router.push({ path: '/register' })
     }
 
-    this.$utils.getElement(this, 'pwd').focus()
+    this.$utils.common.getElement(this, 'pwd').focus()
   }
 }
 </script>

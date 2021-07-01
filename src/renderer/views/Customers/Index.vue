@@ -51,8 +51,8 @@
           </CCardBody>
         </CCollapse>
         <CCardFooter>
-          <CButton type="submit" size="sm" color="success" @click="find"><CIcon name="cil-check-circle"/> 검색</CButton>
-          <CButton type="button" size="sm" color="primary" @click="goWrite"><CIcon name="cil-pencil"/> 생성</CButton>
+          <CButton type="button" size="sm" color="primary" @click="goWrite">생성</CButton>
+          <CButton type="submit" size="sm" color="success" class="float-right" @click="find">검색</CButton>
         </CCardFooter>
       </CCard>
     </transition>
@@ -67,7 +67,7 @@
         <template #contact="{item}">
           <td class="address">
             <span v-c-tooltip="{content: item.address}">
-              {{item.contact}}
+              {{$utils.masking.phone(item.contact)}}
             </span>
           </td>
         </template>
