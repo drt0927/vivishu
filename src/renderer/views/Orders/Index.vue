@@ -3,7 +3,7 @@
     <transition name="fade">
       <CCard>
         <CCardHeader>
-          <strong>고객 관리 </strong> <small>목록</small>
+          <strong>주문장 관리 </strong> <small>목록</small>
           <div class="card-header-actions">
             <CLink class="card-header-action btn-minimize" @click="bind.isCollapsed = !bind.isCollapsed">
               <CIcon :name="`cil-chevron-${bind.isCollapsed ? 'bottom' : 'top'}`"/>
@@ -15,35 +15,38 @@
             <CRow>
               <CCol sm="6">
                 <CInput
-                  label="이름"
-                  placeholder="이름을 입력해 주세요. [like]"
+                  label="주문자명"
+                  placeholder="주문자명을 입력해 주세요. [like]"
                   v-model="search.name"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
-                <CInput
-                  label="연락처"
-                  placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="search.contact"
+                <CSelect
+                  label="구분"
+                  :value.sync="search.type"
+                  :options="bind.type"
                   @keyup.enter="find"
                 />
               </CCol>
             </CRow>
             <CRow>
               <CCol sm="6">
-                <CSelect
-                  label="행사 알림"
-                  :value.sync="search.isEventAlarm"
-                  :options="bind.isEventAlarmOptions"
-                  @keyup.enter="find"
-                />
+                <v-date-picker v-model="date" mode="date" :masks="{ input: 'YYYY-MM-DD' }">
+                  <template v-slot="{ inputValue, inputEvents }">
+                    <input
+                      class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
+                      :value="inputValue"
+                      v-on="inputEvents"
+                    />
+                  </template>
+                </v-date-picker>
               </CCol>
               <CCol sm="6">
                 <CInput
-                  label="설명"
-                  placeholder="설명을 입력해 주세요. [like]"
-                  v-model="search.description"
+                  label="송장번호"
+                  placeholder="송장번호를 입력해 주세요. [like]"
+                  v-model="search.deliveryNo"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -56,6 +59,7 @@
         </CCardFooter>
       </CCard>
     </transition>
+
     <CCard>
       <CDataTable
         :items="list.rows"
@@ -63,7 +67,7 @@
         :items-per-page="list.perPage"
         hover
       >
-        <template #contact="{item}">
+        <!-- <template #contact="{item}">
           <td>
             <span v-c-tooltip="{content: item.address}">
               {{$utils.masking.phone(item.contact)}}
@@ -74,7 +78,7 @@
           <td>
             <h5><CBadge :color="item.isEventAlarm ? 'success' : 'danger'" v-c-tooltip="{content: item.description}">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge></h5>
           </td>
-        </template>
+        </template> -->
         <template #btnDetail="{item}">
           <td>
             <CButton
@@ -101,30 +105,37 @@
 
 <script>
 export default {
-  name: 'customers',
+  name: 'orders',
   data () {
     return {
-      date: new Date(),
       bind: {
-        isEventAlarmOptions: [
+        deliveryCompletedDate: [
           { value: '', label: '전체' },
-          { value: true, label: '알림' },
-          { value: false, label: '미알림' }
+          { value: true, label: '완료' },
+          { value: false, label: '미완료' }
+        ],
+        type: [
+          { value: '', label: '전체' },
+          { value: 1, label: '매장' },
+          { value: 2, label: '네이버' },
+          { value: 3, label: '롯데' }
         ],
         isCollapsed: true
       },
       search: {
         name: '',
-        contact: '',
-        isEventAlarm: '',
-        description: ''
+        type: '',
+        deliveryCompletedDate: '',
+        deliveryNo: ''
       },
       list: {
         rows: [],
         fields: [
-          { key: 'name', label: '이름' },
-          { key: 'contact', label: '연락처' },
-          { key: 'isEventAlarm', label: '행사알림' },
+          { key: 'createDate', label: '작성일' },
+          { key: 'name', label: '주문자명' },
+          { key: 'type', label: '구분' },
+          { key: 'releaseDate', label: '출고일' },
+          { key: 'products', label: '품번' },
           { key: 'btnDetail', label: '상세' }
         ],
         currentPage: 1,
@@ -140,17 +151,17 @@ export default {
   },
   methods: {
     async find () {
-      let db = this.$db.customers
+      let db = this.$db.orders
       await db.find(
         this.search
-        , { name: 1 }
+        , { createDate: -1 }
         , this.list)
     },
     goWrite () {
-      this.$router.push({ path: '/customers/write' })
+      this.$router.push({ path: '/orders/write' })
     },
     goDetail (id) {
-      this.$router.push({ path: `/customers/${id}` })
+      this.$router.push({ path: `/orders/${id}` })
     }
   },
   mounted () {

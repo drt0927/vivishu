@@ -4,7 +4,7 @@
       <CCardHeader>
         <strong>고객 관리</strong> 상세
         <div class="card-header-actions">
-          <CButton type="button" size="sm" color="danger" @click="remove()">삭제</CButton>
+          <CButton type="button" size="sm" color="danger" @click="remove">삭제</CButton>
         </div>
       </CCardHeader>
       <CCardBody>
@@ -18,10 +18,10 @@
           label="연락처"
           horizontal
           disabled
-          v-bind:value="$utils.masking.phone(customer.contact)"
+          v-bind:value="contact"
         >
           <template #append>
-            <CButton type="button" color="info" @click="contactRead()">확인</CButton>
+            <CButton type="button" color="info" @click="authCheck(actionCodes.CONTACT_READ)">확인</CButton>
           </template>
         </CInput>
         <CInput
@@ -59,35 +59,103 @@
       <CCardFooter>
         <CRow>
           <CCol>
-            <CButton type="submit" size="sm" color="primary" @click="goEdit(id)">수정</CButton>
+            <CButton type="submit" size="sm" color="primary" @click="authCheck(actionCodes.DOCUMENT_UPDATE)">수정</CButton>
           </CCol>
           <CCol col="2">
-            <CButton type="submit" size="sm" color="secondary" class="float-right" @click="goIndex()">목록</CButton>
+            <CButton type="submit" size="sm" color="secondary" class="float-right" @click="goIndex">목록</CButton>
           </CCol>
         </CRow>
       </CCardFooter>
     </CCard>
+
+    <CModal
+      title="접근권한 확인"
+      color="info"
+      :show.sync="modal.show"
+    >
+    <CRow>
+      <CCol>
+        <CInput
+          label="계정 비밀번호"
+          placeholder="비밀번호를 입력해주세요."
+          ref="pwd"
+          type="password"
+          v-model="modal.pwd"
+          @keydown.enter="modalCompleted"
+        />
+      </CCol>
+    </CRow>
+    <template #footer>
+      <CButton @click="modalCompleted" color="success">확인</CButton>
+      <CButton @click="modal.show = false" color="danger">취소</CButton>
+      </template>
+    </CModal>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'customers-detail',
   data () {
     return {
       id: this.$route.params.id,
-      customer: this.$db.customers.getNewDocument()
+      customer: this.$db.customers.getNewDocument(),
+      actionCodes: {
+        CONTACT_READ: 1,
+        DOCUMENT_UPDATE: 2
+      },
+      modal: {
+        show: false,
+        confirmPwd: false,
+        actionCode: 0,
+        pwd: ''
+      }
+    }
+  },
+  computed: {
+    ...mapGetters({
+      accountId: 'Auth/id'
+    }),
+    contact () {
+      return this.modal.confirmPwd && this.modal.actionCode === this.actionCodes.CONTACT_READ ? this.customer.contact : this.$utils.masking.phone(this.customer.contact)
     }
   },
   methods: {
     goIndex () {
       this.$router.push({ path: '/customers' })
     },
-    goEdit (id) {
-      this.$router.push({ path: `/customers/Write/${id}` })
-    },
-    contactRead () {
+    authCheck (actionCode) {
+      this.modal.actionCode = actionCode
+      if (!this.modal.confirmPwd) {
+        this.modal.show = true
+        return
+      }
 
+      if (this.modal.actionCode === this.actionCodes.DOCUMENT_UPDATE) {
+        this.$router.push({ path: `/customers/Write/${this.id}` })
+      }
+    },
+    async modalCompleted () {
+      let db = this.$db.accounts
+      let account = { id: this.accountId, pwd: this.modal.pwd }
+      if (!db.validLogin(this, account)) {
+        return
+      }
+
+      let find = await db.findOne(account)
+      if (!find.isSuccess) {
+        alert(find.result)
+        return
+      }
+
+      this.modal.confirmPwd = true
+      this.modal.show = false
+
+      if (this.modal.actionCode === this.actionCodes.DOCUMENT_UPDATE) {
+        this.$router.push({ path: `/customers/Write/${this.id}` })
+      }
     },
     async remove () {
       if (confirm('삭제하시겠습니까?')) {
@@ -105,7 +173,6 @@ export default {
           timerProgressBar: true,
           icon: 'success',
           title: '고객 정보 삭제 완료'
-          // text: '고객정보가 삭제되었습니다.'
         })
 
         this.goIndex()

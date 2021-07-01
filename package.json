@@ -58,6 +58,7 @@
     "axios": "^0.18.0",
     "moment": "^2.29.1",
     "nedb": "^1.8.0",
+    "v-calendar": "^2.3.0",
     "vue": "^2.5.16",
     "vue-daum-postcode": "^0.10.0",
     "vue-electron": "^1.0.6",

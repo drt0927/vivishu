@@ -12,6 +12,7 @@
 
 <style lang="scss">
   @import '~@coreui/coreui/scss/coreui';
-  @import '~sweetalert2/dist/sweetalert2.min.css'
+  @import '~sweetalert2/dist/sweetalert2.min.css';
+  @import '~v-calendar/src/styles/base.css';
   /* CSS */
 </style>

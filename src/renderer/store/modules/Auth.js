@@ -25,6 +25,9 @@ const getters = {
     }
 
     return state.isLogin && state.user.name
+  },
+  id (state) {
+    return state.user.id
   }
 }
 

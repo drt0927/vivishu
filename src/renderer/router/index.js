@@ -30,7 +30,7 @@ export default new Router({
             },
             {
               path: '/customers/write',
-              name: '고객 생성',
+              name: '고객 추가',
               component: require('@/views/Customers/Write').default
             },
             {
@@ -48,8 +48,31 @@ export default new Router({
         // #endregion
         {
           path: '/stores',
+          redirect: '/stores',
           name: '지점',
-          component: require('@/views/Stores').default
+          component: require('@/views/Stores/Stores').default,
+          children: [
+            {
+              path: '/stores',
+              name: '지점 목록',
+              component: require('@/views/Stores/Index').default
+            },
+            {
+              path: '/stores/write',
+              name: '지점 추가',
+              component: require('@/views/Stores/Write').default
+            },
+            {
+              path: '/stores/write/:id',
+              name: '지점 수정',
+              component: require('@/views/Stores/Write').default
+            },
+            {
+              path: '/stores/:id',
+              name: '지점 상세',
+              component: require('@/views/Stores/Detail').default
+            }
+          ]
         },
         {
           path: '/schedules',
@@ -63,8 +86,26 @@ export default new Router({
         },
         {
           path: '/orders',
+          redirect: '/orders',
           name: '주문장',
-          component: require('@/views/Orders').default
+          component: require('@/views/Orders/Orders').default,
+          children: [
+            {
+              path: '/orders',
+              name: '주문장 목록',
+              component: require('@/views/Orders/Index').default
+            },
+            {
+              path: '/orders/write',
+              name: '주문장 추가',
+              component: require('@/views/Orders/Write').default
+            },
+            {
+              path: '/orders/write/:id',
+              name: '주문장 수정',
+              component: require('@/views/Orders/Write').default
+            }
+          ]
         },
         {
           path: '/trades',

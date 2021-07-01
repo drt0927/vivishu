@@ -66,7 +66,7 @@ export default {
       'logout'
     ]),
     async tryLogin () {
-      var db = this.$db.accounts
+      let db = this.$db.accounts
       if (!db.validLogin(this, this.account)) {
         return
       }

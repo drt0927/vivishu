@@ -63,6 +63,14 @@ const check = {
       return false
     }
     return true
+  },
+  call (str) {
+    var regExp = /(\d{3})(\d{3}|\d{4})(\d{4}$)/g
+    var result = regExp.exec(str)
+    if (!result) {
+      return false
+    }
+    return true
   }
 }
 
@@ -150,24 +158,7 @@ const structures = {
       createDate: Date
     }
   },
-  getStoreModel () {
-    // 매장 정보
-    return {
-      // 이름
-      name: String,
-      // 연락처
-      contact: String,
-      // 배송코드
-      deliveryCode: String,
-      // 매니저
-      owner: String,
-      // 설명
-      description: String,
-      // 생성일
-      createDate: Date
-    }
-  },
-  getProductModel () {
+  roductModel () {
     // 상품 정보 (order, trade 하위에서만 사용됨)
     return {
       // 제품 번호

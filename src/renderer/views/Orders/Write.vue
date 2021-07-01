@@ -2,25 +2,17 @@
   <div>
     <CCard>
       <CCardHeader>
-        <strong>고객 관리</strong> {{id ? '수정' : '추가'}}
+        <strong>주문장 관리</strong> {{id ? '수정' : '추가'}}
       </CCardHeader>
       <CCardBody>
         <CForm>
           <CInput
-            description="이름을 입력해 주세요."
-            label="이름"
+            description="주문자명을 입력해 주세요."
+            label="주문자명"
             horizontal
             autocomplete="name"
             ref="name"
-            v-model="customer.name"
-            @keyup.enter="excute"
-          />
-          <CInput
-            label="연락처"
-            description="연락처를 입력해 주세요."
-            horizontal
-            ref="contact"
-            v-model="customer.contact"
+            v-model="order.name"
             @keyup.enter="excute"
           />
           <CInput
@@ -28,13 +20,28 @@
             description="주소를 입력해 주세요."
             horizontal
             ref="address"
-            v-model="customer.address"
+            v-model="order.address"
             @keyup.enter="excute"
           >
             <template #append>
               <CButton type="button" color="info" @click="addressSearch">검색</CButton>
             </template>
           </CInput>
+          <CSelect
+            label="구분"
+            horizontal
+            :value.sync="order.type"
+            :options="bind.type"
+            @keyup.enter="excute"
+          />
+          <data-picker></data-picker>
+          <CInput
+            label="배송완료일"
+            horizontal
+            ref="contact"
+            v-model="customer.contact"
+            @keyup.enter="excute"
+          />
           <CRow form class="form-group">
             <CCol tag="label" sm="3" class="col-form-label">
               행사알림
@@ -73,7 +80,7 @@
 
 <script>
 export default {
-  name: 'customers-write',
+  name: 'orders-write',
   data () {
     return {
       id: this.$route.params.id,

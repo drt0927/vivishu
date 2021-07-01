@@ -52,6 +52,8 @@ export default class NedbHelper {
         query[key] = new RegExp(doc[key])
       } else if (typeof (doc[key]) === 'boolean' && doc[key] !== '') {
         query[key] = doc[key]
+      } else if (typeof (doc[key]) === 'number' && doc[key] !== '') {
+        query[key] = doc[key]
       }
     }
 
