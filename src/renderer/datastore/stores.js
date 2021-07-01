@@ -19,7 +19,7 @@ class Store extends NedbHelper {
   }
 
   getNewDocument (defaultObject) {
-    return Object.assign({
+    return Object.assign({}, {
       name: '',
       contact: '',
       deliveryCode: '',

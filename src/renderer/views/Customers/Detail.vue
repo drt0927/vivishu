@@ -44,7 +44,7 @@
           </CCol>
         </CRow>
         <CInput
-          label="설명"
+          label="메모"
           horizontal
           disabled
           v-bind:value="customer.description"

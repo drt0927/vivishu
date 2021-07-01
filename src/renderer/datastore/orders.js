@@ -2,7 +2,7 @@ import Datastore from 'nedb'
 import path from 'path'
 import { remote } from 'electron'
 import NedbHelper from './nedbHelper'
-// import utils from '../utils/utils'
+import utils from '../utils/utils'
 // import enums from '../utils/enums'
 
 const dbFactory = file =>
@@ -19,13 +19,13 @@ class Order extends NedbHelper {
   }
 
   getNewDocument (defaultObject) {
-    return Object.assign({
+    return Object.assign({}, {
       customerId: '',
       name: '',
       address: '',
       type: 0, // [ 1 - 매장 | 2 - 네이버 | 3 - 롯데 ]
       deliveryCompletedDate: null,
-      releaseDate: null,
+      releaseDate: new Date(),
       deliveryNo: '',
       deliveryCompany: 0, // [ 0 - 기타 | 1 - 롯데 | 2 - 로젠 ]
       description: '',
@@ -43,11 +43,25 @@ class Order extends NedbHelper {
   }
 
   valid (vm, doc) {
-    // if (!doc.name) {
-    //   alert(`[지점명]은(는) 필수 값 입니다.`)
-    //   utils.common.getElement(vm, 'name').focus()
-    //   return false
-    // }
+    // 주문자, 주소, 품번만 필수 값
+
+    if (!doc.customerId) {
+      alert(`[주문자]은(는) 필수 값 입니다.`)
+      utils.common.getElement(vm, 'name').focus()
+      return false
+    }
+
+    if (!doc.address) {
+      alert(`[주소]은(는) 필수 값 입니다.`)
+      utils.common.getElement(vm, 'address').focus()
+      return false
+    }
+
+    if (doc.products.length < 1) {
+      alert(`[상품]은(는) 필수 값 입니다.\r\n1개 이상의 상품을 등록해 주세요.`)
+      // utils.common.getElement(vm, 'address').focus()
+      return false
+    }
 
     // if (!utils.check.call(doc.contact)) {
     //   alert('[연락처] 형식이 올바르지 않습니다. 숫자 10~11자리 입니다.')

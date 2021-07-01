@@ -29,7 +29,6 @@ Vue.config.performance = true
 Vue.prototype.$db = db
 moment.locale('ko')
 Vue.prototype.$moment = moment
-
 Vue.use(CoreuiVue)
 Vue.use(FilbertUtils)
 Vue.use(VueSweetalert2)
@@ -39,6 +38,7 @@ Vue.use(VCalendar)
 // Vue.use(BootstrapVue)
 // Vue.use(IconsPlugin)
 /* eslint-disable no-new */
+
 new Vue({
   components: { App },
   router,

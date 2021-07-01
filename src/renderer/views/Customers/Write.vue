@@ -32,7 +32,7 @@
             @keyup.enter="excute"
           >
             <template #append>
-              <CButton type="button" color="info" @click="addressSearch">검색</CButton>
+              <CButton type="button" color="info" @click="modal.show = true">검색</CButton>
             </template>
           </CInput>
           <CRow form class="form-group">
@@ -49,7 +49,7 @@
             </CCol>
           </CRow>
           <CInput
-            label="설명"
+            label="메모"
             horizontal
             ref="description"
             v-model="customer.description"
@@ -62,24 +62,27 @@
         <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
       </CCardFooter>
     </CCard>
-    <div ref="daum-area" class="daum-layer-background">
-      <div class="daum-wrapper">
-        <CIcon class="daum-layer-close" @click="addressSearchClose"></CIcon>
-        <vue-daum-postcode style="margin-top:25px;" @complete="addressSearchComplete" />
-      </div>
-    </div>
+    <address-search-modal :show.sync="modal.show" @complete="addressSearchComplete"/>
   </div>
 </template>
 
 <script>
+import AddressSearchModal from '../../components/Modals/AddressSearchModal.vue'
+
 export default {
   name: 'customers-write',
   data () {
     return {
       id: this.$route.params.id,
       db: this.$db.customers,
-      customer: this.$db.customers.getNewDocument()
+      customer: this.$db.customers.getNewDocument(),
+      modal: {
+        show: false
+      }
     }
+  },
+  components: {
+    AddressSearchModal
   },
   methods: {
     async excute () {
@@ -143,19 +146,8 @@ export default {
         this.$router.push({ path: '/customers' })
       }
     },
-    addressSearch () {
-      this.$refs['daum-area'].style.display = 'block'
-    },
-    addressSearchClose () {
-      this.$refs['daum-area'].style.display = 'none'
-    },
     addressSearchComplete (addr) {
-      let resultAddr = addr.roadAddress
-      if (addr.buildingName) {
-        resultAddr += ` (${addr.buildingName})`
-      }
-      this.customer.address = resultAddr
-      this.addressSearchClose()
+      this.customer.address = addr
     }
   },
   async mounted () {

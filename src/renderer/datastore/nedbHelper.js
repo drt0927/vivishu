@@ -21,8 +21,8 @@ export default class NedbHelper {
         newDoc[field.key] = utils.crypt.encryptSHA512(newDoc[field.key])
       }
     })
-    if (!newDoc.crateDate) {
-      newDoc.crateDate = new Date()
+    if (!newDoc.createDate) {
+      newDoc.createDate = new Date()
     }
 
     // 저장하면 안되는 필드 제거

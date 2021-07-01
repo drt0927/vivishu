@@ -39,7 +39,7 @@
             @keyup.enter="excute"
           />
           <CInput
-            label="설명"
+            label="메모"
             horizontal
             ref="description"
             v-model="store.description"

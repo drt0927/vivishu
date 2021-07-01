@@ -32,15 +32,25 @@
             </CRow>
             <CRow>
               <CCol sm="6">
-                <v-date-picker v-model="date" mode="date" :masks="{ input: 'YYYY-MM-DD' }">
-                  <template v-slot="{ inputValue, inputEvents }">
-                    <input
-                      class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
-                      :value="inputValue"
-                      v-on="inputEvents"
-                    />
-                  </template>
-                </v-date-picker>
+                <!-- <div role="group" class="form-group">
+                  <label for="">출고일</label>
+                  <v-date-picker v-model="search.releaseDate" mode="date" :masks="{ input: 'YYYY-MM-DD' }">
+                    <template v-slot="{ inputValue, inputEvents }">
+                      <input
+                        class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300 form-control"
+                        placeholder="출고일을 선택해 주세요."
+                        :value="inputValue"
+                        v-on="inputEvents"
+                      />
+                    </template>
+                  </v-date-picker>
+                </div> -->
+                <CSelect
+                  label="배송완료"
+                  :value.sync="search.deliveryCompletedDate"
+                  :options="bind.deliveryCompletedDate"
+                  @keyup.enter="find"
+                />
               </CCol>
               <CCol sm="6">
                 <CInput

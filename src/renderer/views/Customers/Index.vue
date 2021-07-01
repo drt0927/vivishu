@@ -41,8 +41,8 @@
               </CCol>
               <CCol sm="6">
                 <CInput
-                  label="설명"
-                  placeholder="설명을 입력해 주세요. [like]"
+                  label="메모"
+                  placeholder="메모를 입력해 주세요. [like]"
                   v-model="search.description"
                   @keyup.enter="find"
                 />

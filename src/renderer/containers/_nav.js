@@ -6,7 +6,7 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'Dashboard',
         to: '/dashboard',
-        icon: 'cil-speedometer'
+        icon: 'cil-chart-pie'
         // badge: {
         //   color: 'primary',
         //   text: 'NEW'
@@ -26,7 +26,7 @@ export default [
         _name: 'CSidebarNavItem',
         name: '지점',
         to: '/stores',
-        icon: 'cil-location-pin'
+        icon: 'cil-home'
       },
       {
         _name: 'CSidebarNavItem',
@@ -48,13 +48,13 @@ export default [
         _name: 'CSidebarNavItem',
         name: '주문장',
         to: '/orders',
-        icon: 'cil-basket'
+        icon: 'cil-cart'
       },
       {
         _name: 'CSidebarNavItem',
         name: '수평이동',
         to: '/trades',
-        icon: 'cil-arrow-right'
+        icon: 'cil-loop-circular'
       }
       // {
       //   _name: 'CSidebarNavDropdown',

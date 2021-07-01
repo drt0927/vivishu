@@ -33,7 +33,7 @@
           v-bind:value="store.owner"
         />
         <CInput
-          label="설명"
+          label="메모"
           horizontal
           disabled
           v-bind:value="store.description"
