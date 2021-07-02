@@ -104,6 +104,11 @@ export default new Router({
               path: '/orders/write/:id',
               name: '주문장 수정',
               component: require('@/views/Orders/Write').default
+            },
+            {
+              path: '/orders/:id',
+              name: '주문장 상세',
+              component: require('@/views/Orders/Detail').default
             }
           ]
         },

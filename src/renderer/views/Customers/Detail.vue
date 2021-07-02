@@ -161,7 +161,7 @@ export default {
       if (confirm('삭제하시겠습니까?')) {
         let remove = await this.$db.customers.remove(this.id)
         if (!remove.isSuccess) {
-          alert('고객정보를 삭제하지 못했습니다.')
+          alert('고객 정보를 삭제하지 못했습니다.')
           return
         }
 

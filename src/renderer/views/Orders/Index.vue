@@ -32,19 +32,6 @@
             </CRow>
             <CRow>
               <CCol sm="6">
-                <!-- <div role="group" class="form-group">
-                  <label for="">출고일</label>
-                  <v-date-picker v-model="search.releaseDate" mode="date" :masks="{ input: 'YYYY-MM-DD' }">
-                    <template v-slot="{ inputValue, inputEvents }">
-                      <input
-                        class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300 form-control"
-                        placeholder="출고일을 선택해 주세요."
-                        :value="inputValue"
-                        v-on="inputEvents"
-                      />
-                    </template>
-                  </v-date-picker>
-                </div> -->
                 <CSelect
                   label="배송완료"
                   :value.sync="search.deliveryCompletedDate"
@@ -77,18 +64,30 @@
         :items-per-page="list.perPage"
         hover
       >
-        <!-- <template #contact="{item}">
+        <template #createDate="{item}">
           <td>
-            <span v-c-tooltip="{content: item.address}">
-              {{$utils.masking.phone(item.contact)}}
-            </span>
+            {{$moment(item.createDate).format('YYYY-MM-DD')}}
           </td>
         </template>
-        <template #isEventAlarm="{item}">
+        <template #type="{item}">
           <td>
-            <h5><CBadge :color="item.isEventAlarm ? 'success' : 'danger'" v-c-tooltip="{content: item.description}">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge></h5>
+            <h5><CBadge :style="getTypeColor(item.type)" >{{getTypeString(item.type)}}</CBadge></h5>
           </td>
-        </template> -->
+        </template>
+        <template #releaseDate="{item}">
+          <td>
+            {{$moment(item.releaseDate).format('YYYY-MM-DD')}}
+          </td>
+        </template>
+        <template #products="{item}">
+          <td>
+              <ul class="products-list">
+                <li v-for="product in item.products" v-bind:key="product.no">
+                  {{product.no}} [ <b>{{product.amount}}</b> - <i>{{product.description}}</i> ]
+                </li>
+              </ul>
+          </td>
+        </template>
         <template #btnDetail="{item}">
           <td>
             <CButton
@@ -141,10 +140,10 @@ export default {
       list: {
         rows: [],
         fields: [
-          { key: 'createDate', label: '작성일' },
-          { key: 'name', label: '주문자명' },
+          { key: 'createDate', label: '작성일', _style: 'width: 100px;' },
+          { key: 'name', label: '주문자명', _style: 'width: 100px;' },
           { key: 'type', label: '구분' },
-          { key: 'releaseDate', label: '출고일' },
+          { key: 'releaseDate', label: '출고일', _style: 'width: 100px;' },
           { key: 'products', label: '품번' },
           { key: 'btnDetail', label: '상세' }
         ],
@@ -167,6 +166,24 @@ export default {
         , { createDate: -1 }
         , this.list)
     },
+    getTypeString (type) {
+      if (type === 1) {
+        return '매장'
+      } else if (type === 2) {
+        return '네이버'
+      } else if (type === 3) {
+        return '롯데'
+      }
+    },
+    getTypeColor (type) {
+      if (type === 1) {
+        return 'background-color: #ccc;'
+      } else if (type === 2) {
+        return 'background-color: #19CE60; color: white;'
+      } else if (type === 3) {
+        return 'background-color: #E30613; color: white;'
+      }
+    },
     goWrite () {
       this.$router.push({ path: '/orders/write' })
     },
@@ -181,5 +198,9 @@ export default {
 </script>
 
 <style>
-
+.products-list {
+  list-style-type: disc;
+  margin: 0;
+  padding-left: 20px;
+}
 </style>

@@ -23,7 +23,7 @@ class Order extends NedbHelper {
       customerId: '',
       name: '',
       address: '',
-      type: 0, // [ 1 - 매장 | 2 - 네이버 | 3 - 롯데 ]
+      type: 1, // [ 1 - 매장 | 2 - 네이버 | 3 - 롯데 ]
       deliveryCompletedDate: null,
       releaseDate: new Date(),
       deliveryNo: '',
@@ -34,7 +34,7 @@ class Order extends NedbHelper {
   }
 
   getProductDocument (product) {
-    return Object.assign({
+    return Object.assign({}, {
       no: '',
       amount: 0,
       isConfirm: false,
@@ -59,15 +59,14 @@ class Order extends NedbHelper {
 
     if (doc.products.length < 1) {
       alert(`[상품]은(는) 필수 값 입니다.\r\n1개 이상의 상품을 등록해 주세요.`)
-      // utils.common.getElement(vm, 'address').focus()
+      if (vm.order.products.length < 1) {
+        vm.addProduct()
+      } else {
+        utils.common.getElement(vm, 'no').focus()
+      }
+
       return false
     }
-
-    // if (!utils.check.call(doc.contact)) {
-    //   alert('[연락처] 형식이 올바르지 않습니다. 숫자 10~11자리 입니다.')
-    //   utils.common.getElement(vm, 'contact').focus()
-    //   return false
-    // }
 
     return true
   }

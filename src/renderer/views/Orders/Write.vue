@@ -39,21 +39,15 @@
             :options="bind.type"
             @keyup.enter="excute"
           />
-          <v-date-picker v-model="order.releaseDate" mode="date" :masks="{ input: 'YYYY-MM-DD' }">
-            <template v-slot="{ inputValue, inputEvents }">
-              <div role="group" class="form-group form-row">
-                <label class="col-form-label col-sm-3">출고일</label>
-                <div class="col-sm-9">
-                  <input
-                    class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300 form-control"
-                    placeholder="출고일을 선택해 주세요."
-                    :value="inputValue"
-                    v-on="inputEvents"
-                  />
-                </div>
-              </div>
-            </template>
-          </v-date-picker>
+          <date-picker
+            :date.sync="order.releaseDate"
+            horizontal
+            ref="releaseDate"
+            mask="YYYY-MM-DD"
+            placeholder="출고일을 선택해 주세요."
+            label="출고일"
+            @keyup.enter="excute"
+          />
           <CSelect
             label="배송업체"
             horizontal
@@ -69,21 +63,15 @@
             v-model="order.deliveryNo"
             @keyup.enter="excute"
           />
-          <v-date-picker v-model="order.deliveryCompletedDate" mode="date" :masks="{ input: 'YYYY-MM-DD' }">
-            <template v-slot="{ inputValue, inputEvents }">
-              <div role="group" class="form-group form-row">
-                <label class="col-form-label col-sm-3">배송완료일</label>
-                <div class="col-sm-9">
-                  <input
-                    class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300 form-control"
-                    placeholder="배송완료일을 선택해 주세요."
-                    :value="inputValue"
-                    v-on="inputEvents"
-                  />
-                </div>
-              </div>
-            </template>
-          </v-date-picker>
+          <date-picker
+            :date.sync="order.deliveryCompletedDate"
+            horizontal
+            ref="deliveryCompletedDate"
+            mask="YYYY-MM-DD"
+            placeholder="배송완료일을 선택해 주세요."
+            label="배송완료일"
+            @keyup.enter="excute"
+          />
           <CInput
             label="메모"
             horizontal
@@ -114,12 +102,12 @@
           </template>
           <template #amount="{item}">
             <td>
-              <CInput type="number" v-model="item.amount" @keyup.enter="addProduct" @keyup.shift.enter="excute" />
+              <CInput type="number" v-model="item.amount" @keyup.shift.enter="addProduct" @keyup.ctrl.enter="excute" />
             </td>
           </template>
           <template #description="{item}">
             <td>
-              <CInput type="text" v-model="item.description" @keyup.enter="addProduct" @keyup.shift.enter="excute" />
+              <CInput type="text" v-model="item.description" @keyup.shift.enter="addProduct" @keyup.ctrl.enter="excute" />
             </td>
           </template>
           <template #btnRemove="{index}">
@@ -148,6 +136,7 @@
 <script>
 import AddressSearchModal from '../../components/Modals/AddressSearchModal.vue'
 import CustomerSearchModal from '../../components/Modals/CustomerSearchModal.vue'
+import DatePicker from '../../components/Controls/DatePicker.vue'
 
 export default {
   name: 'orders-write',
@@ -178,12 +167,12 @@ export default {
         { key: 'description', label: '메모' },
         { key: 'btnRemove', label: '' }
       ]
-
     }
   },
   components: {
     AddressSearchModal,
-    CustomerSearchModal
+    CustomerSearchModal,
+    DatePicker
   },
   methods: {
     async excute () {
