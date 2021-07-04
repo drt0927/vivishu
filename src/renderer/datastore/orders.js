@@ -35,6 +35,7 @@ class Order extends NedbHelper {
 
   getProductDocument (product) {
     return Object.assign({}, {
+      _id: 0,
       no: '',
       amount: 0,
       isConfirm: false,

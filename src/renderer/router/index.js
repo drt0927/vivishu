@@ -76,8 +76,16 @@ export default new Router({
         },
         {
           path: '/schedules',
+          redirect: '/schedules',
           name: '일정',
-          component: require('@/views/Schedules').default
+          component: require('@/views/Schedules/Schedules').default,
+          children: [
+            {
+              path: '/schedules',
+              name: '일정 목록',
+              component: require('@/views/Schedules/Index').default
+            }
+          ]
         },
         {
           path: '/todos',

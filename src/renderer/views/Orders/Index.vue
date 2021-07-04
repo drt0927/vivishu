@@ -82,7 +82,7 @@
         <template #products="{item}">
           <td>
               <ul class="products-list">
-                <li v-for="product in item.products" v-bind:key="product.no">
+                <li v-for="product in item.products" v-bind:key="product._id">
                   {{product.no}} [ <b>{{product.amount}}</b> - <i>{{product.description}}</i> ]
                 </li>
               </ul>
@@ -193,6 +193,7 @@ export default {
   },
   mounted () {
     this.find()
+    window.scrollTo(0, 0)
   }
 }
 </script>

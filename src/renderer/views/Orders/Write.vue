@@ -233,10 +233,17 @@ export default {
       this.order.products.push(this.$db.orders.getProductDocument())
       setTimeout(() => {
         this.$utils.common.getElement(this, 'no').focus()
+        this.productIdReset()
       }, 0)
     },
     removeProduct (index) {
       this.order.products.splice(index, 1)
+      this.productIdReset()
+    },
+    productIdReset () {
+      this.order.products.forEach((product, index) => {
+        product._id = index
+      })
     },
     goList () {
       if (this.id) {

@@ -15,7 +15,6 @@ import VueSweetalert2 from 'vue-sweetalert2'
 import VueDaumPostcode from 'vue-daum-postcode'
 import VCalendar from 'v-calendar'
 import moment from 'moment'
-
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
 // import 'bootstrap/dist/css/bootstrap.css'

@@ -15,7 +15,7 @@
         :disabled="disabled"
         :ref="$vnode.data.ref"
         @click="togglePopover({ placement: 'bottom', transition: 'none', showDelay: 0, hideDelay: 0 })"
-        @keyup="$listeners.keyup"
+        @keyup="$listeners.keyup || undefined"
       >
         <template #append>
           <CButton type="button" color="info" :disabled="disabled || (selectedDate === null) ? true : false" @click="selectedDate = null">Clear</CButton>
