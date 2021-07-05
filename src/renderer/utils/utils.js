@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import enums from './enums'
 
 const common = {
   getElement (vm, ref) {
@@ -213,5 +214,6 @@ export default {
   masking,
   check,
   crypt,
-  structures
+  structures,
+  enums
 }

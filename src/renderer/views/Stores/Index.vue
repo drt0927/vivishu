@@ -17,7 +17,7 @@
                 <CInput
                   label="지점명"
                   placeholder="지점명을 입력해 주세요. [like]"
-                  v-model="search.name"
+                  v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -25,7 +25,7 @@
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [like]"
-                  v-model="search.contact"
+                  v-model="search.contact.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -35,7 +35,7 @@
                 <CInput
                   label="매니저"
                   placeholder="매니저를 입력해 주세요. [like]"
-                  v-model="search.owner"
+                  v-model="search.owner.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -43,7 +43,7 @@
                 <CInput
                   label="메모"
                   placeholder="메모를 입력해 주세요. [like]"
-                  v-model="search.description"
+                  v-model="search.description.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -104,10 +104,22 @@ export default {
         isCollapsed: true
       },
       search: {
-        name: '',
-        contact: '',
-        owner: '',
-        description: ''
+        name: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        contact: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        owner: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        description: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        }
       },
       list: {
         rows: [],

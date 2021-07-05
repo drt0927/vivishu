@@ -17,14 +17,14 @@
                 <CInput
                   label="주문자명"
                   placeholder="주문자명을 입력해 주세요. [like]"
-                  v-model="search.name"
+                  v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
                 <CSelect
                   label="구분"
-                  :value.sync="search.type"
+                  :value.sync="search.type.value"
                   :options="bind.type"
                   @keyup.enter="find"
                 />
@@ -34,7 +34,7 @@
               <CCol sm="6">
                 <CSelect
                   label="배송완료"
-                  :value.sync="search.deliveryCompletedDate"
+                  :value.sync="search.deliveryCompletedDate.value"
                   :options="bind.deliveryCompletedDate"
                   @keyup.enter="find"
                 />
@@ -43,7 +43,7 @@
                 <CInput
                   label="송장번호"
                   placeholder="송장번호를 입력해 주세요. [like]"
-                  v-model="search.deliveryNo"
+                  v-model="search.deliveryNo.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -132,10 +132,31 @@ export default {
         isCollapsed: true
       },
       search: {
-        name: '',
-        type: '',
-        deliveryCompletedDate: '',
-        deliveryNo: ''
+        name: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        type: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        },
+        deliveryCompletedDate: {
+          operator: this.$utils.enums.NedbQueryOperators.Where,
+          value: '',
+          callback: function (value) {
+            this.func = function () {
+              if (value === true) {
+                return this.deliveryCompletedDate !== null
+              } else if (value === false) {
+                return this.deliveryCompletedDate === null
+              }
+            }
+          }
+        },
+        deliveryNo: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        }
       },
       list: {
         rows: [],
