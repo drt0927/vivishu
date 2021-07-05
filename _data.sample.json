@@ -81,20 +81,9 @@
             "tradeDate": "2021-06-22",
             // [ 1 - 입고 | 2 - 출고 ]
             "type": 1,
-            "products": [
-                {
-                    "_id": 1,
-                    "no": "TEST1123",
-                    "amount": 1,
-                    "isConfirm": true
-                },
-                {
-                    "_id": 2,
-                    "no": "BLACK1123",
-                    "amount": 3,
-                    "isConfirm": false
-                }
-            ]
+            "no": "TEST1123",
+            "amount": 1,
+            "isConfirm": true
         }
     ],
     "stores": [

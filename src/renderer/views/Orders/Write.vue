@@ -13,7 +13,8 @@
             ref="name"
             readonly
             v-model="order.name"
-            @keyup.enter="excute"
+            @keyup.enter="modal.customerSearchModalShow = true"
+            @click="modal.customerSearchModalShow = true"
           >
           <template #append>
             <CButton type="button" color="info" @click="modal.customerSearchModalShow = true">검색</CButton>
@@ -264,13 +265,23 @@ export default {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.id) {
-      let find = await this.db.findOne({ _id: this.id })
+      let find = await this.db.findOne({
+        _id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: this.id
+        }
+      })
       if (!find.isSuccess) {
         alert(find.result)
         return
       }
 
       this.order = find.result[0]
+    }
+
+    if (this.$route.query.customerId) {
+      this.order.customerId = this.$route.query.customerId
+      this.order.name = this.$route.query.name
     }
   }
 }

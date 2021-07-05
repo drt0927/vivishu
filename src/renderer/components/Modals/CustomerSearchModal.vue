@@ -17,7 +17,7 @@
                 <CInput
                   label="이름"
                   placeholder="이름을 입력해 주세요. [like]"
-                  v-model="search.name"
+                  v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -25,7 +25,7 @@
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="search.contact"
+                  v-model="search.contact.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -34,7 +34,7 @@
               <CCol sm="6">
                 <CSelect
                   label="행사 알림"
-                  :value.sync="search.isEventAlarm"
+                  :value.sync="search.isEventAlarm.value"
                   :options="bind.isEventAlarmOptions"
                   @keyup.enter="find"
                 />
@@ -43,7 +43,7 @@
                 <CInput
                   label="설명"
                   placeholder="설명을 입력해 주세요. [like]"
-                  v-model="search.description"
+                  v-model="search.description.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -51,6 +51,7 @@
           </CCardBody>
         </CCollapse>
         <CCardFooter>
+          <CButton type="submit" size="sm" color="primary" @click="goWrite">추가</CButton>
           <CButton type="submit" size="sm" color="success" class="float-right" @click="find">검색</CButton>
         </CCardFooter>
       </CCard>
@@ -104,10 +105,22 @@ export default {
         isCollapsed: true
       },
       search: {
-        name: '',
-        contact: '',
-        isEventAlarm: '',
-        description: ''
+        name: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        contact: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        },
+        isEventAlarm: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        },
+        description: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        }
       },
       list: {
         rows: [],
@@ -133,6 +146,9 @@ export default {
     selected (item) {
       this.$emit('selected', item._id, item.name)
       this.isShow = false
+    },
+    goWrite () {
+      this.$router.push({ path: '/customers/write' })
     }
   },
   mounted () {

@@ -36,6 +36,15 @@ export default class NedbHelper {
     return newDoc
   }
 
+  getDocuments (docs) {
+    let newDocs = []
+    for (var doc of docs) {
+      newDocs.push(this.getDocument(doc))
+    }
+
+    return newDocs
+  }
+
   // 깊은 복사
   deepClone (obj) {
     if (!obj) {
@@ -96,6 +105,30 @@ export default class NedbHelper {
     }
 
     return query
+  }
+
+  async insertRange (docs) {
+    return new Promise(async (resolve) => {
+      let newDocs = this.getDocuments(docs)
+      if (newDocs.length < 1) {
+        return
+      }
+
+      for (let doc of newDocs) {
+        let result = await this.insert(doc)
+        if (!result.isSuccess) {
+          resolve({
+            isSuccess: false,
+            result: result.err
+          })
+          break
+        }
+      }
+
+      resolve({
+        isSuccess: true
+      })
+    })
   }
 
   async insert (doc) {

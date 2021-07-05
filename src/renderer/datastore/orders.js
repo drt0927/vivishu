@@ -38,7 +38,6 @@ class Order extends NedbHelper {
       _id: 0,
       no: '',
       amount: 0,
-      isConfirm: false,
       description: ''
     }, product)
   }

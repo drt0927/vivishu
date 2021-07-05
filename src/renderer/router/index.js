@@ -122,8 +122,31 @@ export default new Router({
         },
         {
           path: '/trades',
+          redirect: '/trades',
           name: '수평이동',
-          component: require('@/views/Trades').default
+          component: require('@/views/Trades/Trades').default,
+          children: [
+            {
+              path: '/trades',
+              name: '수평이동 목록',
+              component: require('@/views/Trades/Index').default
+            },
+            {
+              path: '/trades/write',
+              name: '수평이동 추가',
+              component: require('@/views/Trades/Write').default
+            },
+            {
+              path: '/trades/edit/:id',
+              name: '수평이동 수정',
+              component: require('@/views/Trades/Edit').default
+            },
+            {
+              path: '/trades/:id',
+              name: '수평이동 상세',
+              component: require('@/views/Trades/Detail').default
+            }
+          ]
         }
       ]
       // component: require('@/components/Layouts/Default').default

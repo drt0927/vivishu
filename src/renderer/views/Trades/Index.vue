@@ -3,7 +3,7 @@
     <transition name="fade">
       <CCard>
         <CCardHeader>
-          <strong>고객 관리 </strong> <small>목록</small>
+          <strong>수평이동 관리 </strong> <small>목록</small>
           <div class="card-header-actions">
             <CLink class="card-header-action btn-minimize" @click="bind.isCollapsed = !bind.isCollapsed">
               <CIcon :name="`cil-chevron-${bind.isCollapsed ? 'bottom' : 'top'}`"/>
@@ -15,35 +15,35 @@
             <CRow>
               <CCol sm="6">
                 <CInput
-                  label="이름"
-                  placeholder="이름을 입력해 주세요. [like]"
+                  label="지점명"
+                  placeholder="지점명을 입력해 주세요. [like]"
                   v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
-                <CInput
-                  label="연락처"
-                  placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="search.contact.value"
+                <CSelect
+                  label="구분"
+                  :value.sync="search.type.value"
+                  :options="bind.type"
                   @keyup.enter="find"
                 />
               </CCol>
             </CRow>
             <CRow>
               <CCol sm="6">
-                <CSelect
-                  label="행사 알림"
-                  :value.sync="search.isEventAlarm.value"
-                  :options="bind.isEventAlarmOptions"
+                <CInput
+                  label="품번"
+                  placeholder="품번를 입력해 주세요. [like]"
+                  v-model="search.no.value"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
-                <CInput
-                  label="메모"
-                  placeholder="메모를 입력해 주세요. [like]"
-                  v-model="search.description.value"
+                <CSelect
+                  label="확정여부"
+                  :value.sync="search.isConfirm.value"
+                  :options="bind.isConfirm"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -56,6 +56,7 @@
         </CCardFooter>
       </CCard>
     </transition>
+
     <CCard>
       <CDataTable
         :items="list.rows"
@@ -63,16 +64,34 @@
         :items-per-page="list.perPage"
         hover
       >
-        <template #contact="{item}">
+        <template #createDate="{item}">
           <td>
-            <span v-c-tooltip="{content: item.address}">
-              {{$utils.masking.phone(item.contact)}}
-            </span>
+            {{$moment(item.createDate).format('YYYY-MM-DD')}}
           </td>
         </template>
-        <template #isEventAlarm="{item}">
+        <template #type="{item}">
           <td>
-            <h5><CBadge :color="item.isEventAlarm ? 'success' : 'danger'" v-c-tooltip="{content: item.description}">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge></h5>
+            <h5>
+              <CBadge :color="getTypeStyle(item.type).color" >
+                <CIcon :name="getTypeStyle(item.type).icon" />
+                {{getTypeStyle(item.type).label}}
+              </CBadge>
+            </h5>
+          </td>
+        </template>
+        <template #tradeDate="{item}">
+          <td>
+            {{$moment(item.tradeDate).format('YYYY-MM-DD')}}
+          </td>
+        </template>
+        <template #isConfirm="{item}">
+          <td>
+            <CSwitch
+              class="mr-1"
+              color="primary"
+              disabled
+              :checked="item.isConfirm"
+            />
           </td>
         </template>
         <template #btnDetail="{item}">
@@ -101,15 +120,19 @@
 
 <script>
 export default {
-  name: 'customers',
+  name: 'trades',
   data () {
     return {
-      date: new Date(),
       bind: {
-        isEventAlarmOptions: [
+        type: [
           { value: '', label: '전체' },
-          { value: true, label: '알림' },
-          { value: false, label: '미알림' }
+          { value: 1, label: '입고' },
+          { value: 2, label: '출고' }
+        ],
+        isConfirm: [
+          { value: '', label: '전체' },
+          { value: true, label: '확정' },
+          { value: false, label: '미확정' }
         ],
         isCollapsed: true
       },
@@ -118,25 +141,29 @@ export default {
           operator: this.$utils.enums.NedbQueryOperators.Regex,
           value: ''
         },
-        contact: {
+        type: {
           operator: this.$utils.enums.NedbQueryOperators.Equal,
           value: ''
         },
-        isEventAlarm: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: ''
-        },
-        description: {
+        no: {
           operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        isConfirm: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
           value: ''
         }
       },
       list: {
         rows: [],
         fields: [
-          { key: 'name', label: '이름' },
-          { key: 'contact', label: '연락처' },
-          { key: 'isEventAlarm', label: '행사알림' },
+          { key: 'createDate', label: '작성일', _style: 'width: 100px;' },
+          { key: 'name', label: '지점명' },
+          { key: 'type', label: '구분', _style: 'width: 100px;' },
+          { key: 'tradeDate', label: '거래일', _style: 'width: 100px;' },
+          { key: 'no', label: '품번' },
+          { key: 'amount', label: '수량' },
+          { key: 'isConfirm', label: '확정' },
           { key: 'btnDetail', label: '상세' }
         ],
         currentPage: 1,
@@ -146,27 +173,43 @@ export default {
     }
   },
   watch: {
-    'list.currentPage': async function () {
-      await this.find()
+    'list.currentPage': function () {
+      this.find()
     }
   },
   methods: {
     async find () {
-      let db = this.$db.customers
+      let db = this.$db.trades
       await db.find(
         this.search
-        , { name: 1 }
+        , { createDate: -1 }
         , this.list)
     },
+    getTypeStyle (type) {
+      if (type === 1) {
+        return {
+          label: '입고',
+          icon: 'cil-level-down',
+          color: 'success'
+        }
+      } else if (type === 2) {
+        return {
+          label: '출고',
+          icon: 'cil-level-up',
+          color: 'secondary'
+        }
+      }
+    },
     goWrite () {
-      this.$router.push({ path: '/customers/write' })
+      this.$router.push({ path: '/trades/write' })
     },
     goDetail (id) {
-      this.$router.push({ path: `/customers/${id}` })
+      this.$router.push({ path: `/trades/${id}` })
     }
   },
-  async mounted () {
-    await this.find()
+  mounted () {
+    this.find()
+    window.scrollTo(0, 0)
   }
 }
 </script>

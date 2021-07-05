@@ -12,7 +12,7 @@
                   <CInput
                     placeholder="Username"
                     autocomplete="username email"
-                    v-model="account.id"
+                    v-model="account.id.value"
                     @keyup.enter="tryLogin"
                   >
                     <template #prepend-content><CIcon name="cil-user"/></template>
@@ -21,7 +21,7 @@
                     placeholder="Password"
                     type="password"
                     autocomplete="curent-password"
-                    v-model="account.pwd"
+                    v-model="account.pwd.value"
                     ref="pwd"
                     @keyup.enter="tryLogin"
                   >
@@ -50,8 +50,14 @@ export default {
   data () {
     return {
       account: {
-        id: 'admin',
-        pwd: ''
+        id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: 'admin'
+        },
+        pwd: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        }
       }
     }
   },

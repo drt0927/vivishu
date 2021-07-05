@@ -132,7 +132,12 @@ export default {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.id) {
-      let find = await this.db.findOne({ _id: this.id })
+      let find = await this.db.findOne({
+        _id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: this.id
+        }
+      })
       if (!find.isSuccess) {
         alert(find.result)
         return

@@ -1,6 +1,7 @@
 <template>
   <v-date-picker
     v-model="selectedDate"
+    :attributes="attributes"
     mode="date"
     :masks="{ input: mask }"
     :transition="'none'"
@@ -32,6 +33,7 @@ export default {
     date: { type: Date },
     mask: { type: String },
     label: { type: String },
+    attributes: { type: Array },
     horizontal: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false }
   },

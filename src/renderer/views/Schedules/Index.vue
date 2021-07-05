@@ -40,6 +40,7 @@
         />
         <date-picker
           :date.sync="modal.schedule.startDate"
+          :attributes="datepicker.attributes"
           horizontal
           ref="startDate"
           mask="YYYY-MM-DD"
@@ -49,6 +50,7 @@
         />
         <date-picker
           :date.sync="modal.schedule.endDate"
+          :attributes="datepicker.attributes"
           horizontal
           ref="endDate"
           mask="YYYY-MM-DD"
@@ -73,7 +75,7 @@
             <div class="color-picker" style="background:#3CAEA3;" @click="selectColor('calendar-item-blueGreen')"></div>
             <div class="color-picker" style="background:#F6D55C;" @click="selectColor('calendar-item-yellow')"></div>
             <div class="color-picker" style="background:#ED553B;" @click="selectColor('calendar-item-red')"></div>
-            <div class="color-picker" style="background:#5B4DB7;" @click="selectColor('calendar-item-puple')"></div>
+            <div class="color-picker" style="background:#5B4DB7;" @click="selectColor('calendar-item-purple')"></div>
             <div class="color-picker" style="background:#81D152;" @click="selectColor('calendar-item-lime')"></div>
             <div class="color-picker" style="background:#FF9D4F;" @click="selectColor('calendar-item-orange')"></div>
           </CCol>
@@ -117,6 +119,17 @@ export default {
           }
         }
       },
+      datepicker: {
+        attributes: [
+          {
+            highlight: {
+              color: 'purple',
+              fillMode: 'outline'
+            },
+            dates: new Date()
+          }
+        ]
+      },
       modal: {
         show: false,
         title: '일정 정보',
@@ -151,8 +164,11 @@ export default {
       this.modal.schedule.contents = item.originalItem.contents
       this.modal.schedule.startDate = item.startDate
       this.modal.schedule.endDate = item.endDate
-      this.modal.schedule.classes = item.classes
-      this.modal.class = item.originalItem.classes
+
+      let itemClass = item.classes.filter(x => x.startsWith('calendar-item-'))
+      this.modal.schedule.classes = itemClass.length > 0 ? itemClass[0] : ''
+      this.modal.class = itemClass.length > 0 ? itemClass[0] : ''
+
       this.modal.show = true
       this.modal.type = 2 // 수정
       this.modal.title = '일정 수정'
@@ -288,11 +304,11 @@ export default {
   background-color: #ED553B !important;
   color: white;
 }
-.calendar-item-puple {
+.calendar-item-purple {
   background-color: #5B4DB7 !important;
   color: white;
 }
-.modal-calendar-item-puple .modal-header {
+.modal-calendar-item-purple .modal-header {
   background-color: #5B4DB7 !important;
   color: white;
 }

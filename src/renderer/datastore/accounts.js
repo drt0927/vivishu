@@ -62,13 +62,13 @@ class Account extends NedbHelper {
   }
 
   validLogin (vm, doc) {
-    if (!doc.id) {
+    if (!doc.id.value) {
       alert(`[아이디]은(는) 필수 값 입니다.`)
       utils.common.getElement(vm, 'id').focus()
       return false
     }
 
-    if (!doc.pwd) {
+    if (!doc.pwd.value) {
       alert(`[비밀번호]은(는) 필수 값 입니다.`)
       utils.common.getElement(vm, 'pwd').focus()
       return false

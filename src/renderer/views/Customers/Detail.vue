@@ -60,6 +60,7 @@
         <CRow>
           <CCol>
             <CButton type="submit" size="sm" color="primary" @click="authCheck(actionCodes.DOCUMENT_UPDATE)">수정</CButton>
+            <CButton type="button" size="sm" color="info" @click="goOrderWrite">주문장 추가</CButton>
           </CCol>
           <CCol col="2">
             <CButton type="submit" size="sm" color="secondary" class="float-right" @click="goIndex">목록</CButton>
@@ -80,7 +81,7 @@
           placeholder="비밀번호를 입력해주세요."
           ref="pwd"
           type="password"
-          v-model="modal.pwd"
+          v-model="modal.pwd.value"
           @keydown.enter="modalCompleted"
         />
       </CCol>
@@ -110,7 +111,10 @@ export default {
         show: false,
         confirmPwd: false,
         actionCode: 0,
-        pwd: ''
+        pwd: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        }
       }
     }
   },
@@ -126,6 +130,9 @@ export default {
     goIndex () {
       this.$router.push({ path: '/customers' })
     },
+    goOrderWrite () {
+      this.$router.push({ path: `/orders/write?customerId=${this.id}&name=${this.customer.name}` })
+    },
     authCheck (actionCode) {
       this.modal.actionCode = actionCode
       if (!this.modal.confirmPwd) {
@@ -139,7 +146,13 @@ export default {
     },
     async modalCompleted () {
       let db = this.$db.accounts
-      let account = { id: this.accountId, pwd: this.modal.pwd }
+      let account = {
+        id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: this.accountId
+        },
+        pwd: this.modal.pwd
+      }
       if (!db.validLogin(this, account)) {
         return
       }
@@ -180,7 +193,12 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.customers.findOne({ _id: this.id })
+    let find = await this.$db.customers.findOne({
+      _id: {
+        operator: this.$utils.enums.NedbQueryOperators.Equal,
+        value: this.id
+      }
+    })
     if (!find.isSuccess) {
       alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()

@@ -66,7 +66,7 @@ const check = {
     return true
   },
   call (str) {
-    var regExp = /(\d{3})(\d{3}|\d{4})(\d{4}$)/g
+    var regExp = /(\d{2,3})(\d{3}|\d{4})(\d{4}$)/g
     var result = regExp.exec(str)
     if (!result) {
       return false

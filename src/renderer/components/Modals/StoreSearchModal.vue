@@ -1,9 +1,9 @@
 <template>
-  <div style="min-height:1000px;">
+  <CModal title="지점 검색" size="xl" :show.sync="isShow">
     <transition name="fade">
       <CCard>
         <CCardHeader>
-          <strong>고객 관리 </strong> <small>목록</small>
+          <strong>지점 관리 </strong> <small>목록</small>
           <div class="card-header-actions">
             <CLink class="card-header-action btn-minimize" @click="bind.isCollapsed = !bind.isCollapsed">
               <CIcon :name="`cil-chevron-${bind.isCollapsed ? 'bottom' : 'top'}`"/>
@@ -15,8 +15,8 @@
             <CRow>
               <CCol sm="6">
                 <CInput
-                  label="이름"
-                  placeholder="이름을 입력해 주세요. [like]"
+                  label="지점명"
+                  placeholder="지점명을 입력해 주세요. [like]"
                   v-model="search.name.value"
                   @keyup.enter="find"
                 />
@@ -32,10 +32,10 @@
             </CRow>
             <CRow>
               <CCol sm="6">
-                <CSelect
-                  label="행사 알림"
-                  :value.sync="search.isEventAlarm.value"
-                  :options="bind.isEventAlarmOptions"
+                <CInput
+                  label="매니저"
+                  placeholder="매니저를 입력해 주세요. [like]"
+                  v-model="search.owner.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -51,7 +51,7 @@
           </CCardBody>
         </CCollapse>
         <CCardFooter>
-          <CButton type="button" size="sm" color="primary" @click="goWrite">추가</CButton>
+          <CButton type="submit" size="sm" color="primary" @click="goWrite">추가</CButton>
           <CButton type="submit" size="sm" color="success" class="float-right" @click="find">검색</CButton>
         </CCardFooter>
       </CCard>
@@ -61,31 +61,14 @@
         :items="list.rows"
         :fields="list.fields"
         :items-per-page="list.perPage"
+        @row-clicked="selected"
         hover
-      >
-        <template #contact="{item}">
+        >
+        <template #owner="{item}">
           <td>
-            <span v-c-tooltip="{content: item.address}">
-              {{$utils.masking.phone(item.contact)}}
+            <span v-c-tooltip="{content: item.description}">
+              {{item.owner}}
             </span>
-          </td>
-        </template>
-        <template #isEventAlarm="{item}">
-          <td>
-            <h5><CBadge :color="item.isEventAlarm ? 'success' : 'danger'" v-c-tooltip="{content: item.description}">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge></h5>
-          </td>
-        </template>
-        <template #btnDetail="{item}">
-          <td>
-            <CButton
-            color="primary"
-            variant="outline"
-            square
-            size="sm"
-            @click="goDetail(item._id)"
-          >
-            상세
-          </CButton>
           </td>
         </template>
       </CDataTable>
@@ -96,21 +79,19 @@
         align="center"
       />
     </CCard>
-  </div>
+    <template #footer>
+      <div></div>
+    </template>
+  </CModal>
 </template>
 
 <script>
 export default {
-  name: 'customers',
+  name: 'store-search-modal',
   data () {
     return {
       date: new Date(),
       bind: {
-        isEventAlarmOptions: [
-          { value: '', label: '전체' },
-          { value: true, label: '알림' },
-          { value: false, label: '미알림' }
-        ],
         isCollapsed: true
       },
       search: {
@@ -119,11 +100,11 @@ export default {
           value: ''
         },
         contact: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
           value: ''
         },
-        isEventAlarm: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
+        owner: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
           value: ''
         },
         description: {
@@ -134,10 +115,10 @@ export default {
       list: {
         rows: [],
         fields: [
-          { key: 'name', label: '이름' },
+          { key: 'name', label: '지점명' },
           { key: 'contact', label: '연락처' },
-          { key: 'isEventAlarm', label: '행사알림' },
-          { key: 'btnDetail', label: '상세' }
+          { key: 'deliveryCode', label: '배송코드' },
+          { key: 'owner', label: '매니저' }
         ],
         currentPage: 1,
         perPage: 15,
@@ -145,28 +126,42 @@ export default {
       }
     }
   },
-  watch: {
-    'list.currentPage': async function () {
-      await this.find()
-    }
-  },
   methods: {
     async find () {
-      let db = this.$db.customers
+      let db = this.$db.stores
       await db.find(
         this.search
         , { name: 1 }
         , this.list)
     },
-    goWrite () {
-      this.$router.push({ path: '/customers/write' })
+    selected (item) {
+      this.$emit('selected', item._id, item.name)
+      this.isShow = false
     },
-    goDetail (id) {
-      this.$router.push({ path: `/customers/${id}` })
+    goWrite () {
+      this.$router.push({ path: '/stores/write' })
     }
   },
-  async mounted () {
-    await this.find()
+  mounted () {
+    this.find()
+  },
+  watch: {
+    'list.currentPage': function () {
+      this.find()
+    }
+  },
+  props: {
+    show: { type: Boolean }
+  },
+  computed: {
+    isShow: {
+      get () {
+        return this.show
+      },
+      set (val) {
+        this.$emit('update:show', val)
+      }
+    }
   }
 }
 </script>

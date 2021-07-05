@@ -141,7 +141,7 @@ export default {
       this.$router.push({ path: '/orders' })
     },
     goWrite () {
-      this.$router.push({ path: `/orders/Write/${this.id}` })
+      this.$router.push({ path: `/orders/write/${this.id}` })
     },
     async remove () {
       if (confirm('삭제하시겠습니까?')) {
@@ -166,7 +166,12 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.orders.findOne({ _id: this.id })
+    let find = await this.$db.orders.findOne({
+      _id: {
+        operator: this.$utils.enums.NedbQueryOperators.Equal,
+        value: this.id
+      }
+    })
     if (!find.isSuccess) {
       alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()
