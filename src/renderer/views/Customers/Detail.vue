@@ -145,19 +145,13 @@ export default {
       }
     },
     async modalCompleted () {
-      let db = this.$db.accounts
-      let account = {
-        id: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: this.accountId
-        },
-        pwd: this.modal.pwd
-      }
-      if (!db.validLogin(this, account)) {
-        return
+      if (!this.modal.pwd) {
+        alert(`[비밀번호]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'pwd').focus()
+        return false
       }
 
-      let find = await db.findOne(account)
+      let find = await this.$db.accounts2.findOneByQuery({ id: this.accountId, pwd: this.$utils.crypt.encryptSHA512(this.modal.pwd) })
       if (!find.isSuccess) {
         alert(find.result)
         return

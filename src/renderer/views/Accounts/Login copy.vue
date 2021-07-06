@@ -7,22 +7,21 @@
             <CCard class="p-4">
               <CCardBody>
                 <CForm>
-                  <h1>로그인</h1>
-                  <p class="text-muted">비비슈 계정 로그인</p>
+                  <h1>Login</h1>
+                  <p class="text-muted">Sign In to your account</p>
                   <CInput
-                    placeholder="아이디를 입력해 주세요."
-                    autocomplete="id"
-                    ref="id"
-                    v-model="account.id"
+                    placeholder="Username"
+                    autocomplete="username email"
+                    v-model="account.id.value"
                     @keyup.enter="tryLogin"
                   >
                     <template #prepend-content><CIcon name="cil-user"/></template>
                   </CInput>
                   <CInput
-                    placeholder="비밀번호를 입력해 주세요."
+                    placeholder="Password"
                     type="password"
                     autocomplete="curent-password"
-                    v-model="account.pwd"
+                    v-model="account.pwd.value"
                     ref="pwd"
                     @keyup.enter="tryLogin"
                   >
@@ -50,8 +49,16 @@ export default {
   name: 'login',
   data () {
     return {
-      db: this.$db.accounts2,
-      account: this.$db.accounts2.getDocument({ id: 'admin' })
+      account: {
+        id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: 'admin'
+        },
+        pwd: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        }
+      }
     }
   },
   computed: {
@@ -65,11 +72,12 @@ export default {
       'logout'
     ]),
     async tryLogin () {
-      if (!this.valid()) {
+      let db = this.$db.accounts
+      if (!db.validLogin(this, this.account)) {
         return
       }
 
-      let find = await this.db.findOneByQuery({ id: this.account.id, pwd: this.$utils.crypt.encryptSHA512(this.account.pwd) })
+      let find = await this.$db.accounts.findOne(this.account)
       if (!find.isSuccess) {
         this.logout()
         alert(find.result)
@@ -77,26 +85,11 @@ export default {
       }
 
       this.login({
-        id: find.result.id,
-        name: find.result.name
+        id: find.result[0].id,
+        name: find.result[0].name
       })
 
       this.goMain()
-    },
-    valid () {
-      if (!this.account.id) {
-        alert(`[아이디]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'id').focus()
-        return false
-      }
-
-      if (!this.account.pwd) {
-        alert(`[비밀번호]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'pwd').focus()
-        return false
-      }
-
-      return true
     },
     goMain () {
       this.$router.push({ path: '/' })
@@ -107,12 +100,11 @@ export default {
       this.goMain()
     }
 
-    let count = await this.db.count({})
-    if (count.result < 1) {
+    let totalCnt = await this.$db.accounts.count()
+    if (totalCnt < 1) {
       this.$router.push({ path: '/register' })
     }
 
-    console.log(this.account)
     this.$utils.common.getElement(this, 'pwd').focus()
   }
 }

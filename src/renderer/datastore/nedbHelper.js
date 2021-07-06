@@ -86,22 +86,13 @@ export default class NedbHelper {
         if (!query[fieldKey]) {
           query[fieldKey] = {}
         }
-
         query[fieldKey].$gte = search[fieldKey].value
       } else if (search[fieldKey].operator === enums.NedbQueryOperators.LessThanEqual) {
         if (!query[fieldKey]) {
           query[fieldKey] = {}
         }
-
         query[fieldKey].$lte = search[fieldKey].value
       }
-      // if (typeof (doc[key]) === 'string' && doc[key]) {
-      //   query[key] = new RegExp(doc[key])
-      // } else if (typeof (doc[key]) === 'boolean' && doc[key] !== '') {
-      //   query[key] = doc[key]
-      // } else if (typeof (doc[key]) === 'number' && doc[key] !== '') {
-      //   query[key] = doc[key]
-      // }
     }
 
     return query

@@ -47,6 +47,7 @@
             label="수량"
             horizontal
             ref="amount"
+            type="number"
             v-model="trade.amount"
             @keyup.enter="modify"
           />
