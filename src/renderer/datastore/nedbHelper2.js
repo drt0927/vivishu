@@ -64,6 +64,9 @@ export default class NedbHelper {
   async add (doc) {
     return new Promise(resolve => {
       let cryptDoc = cloneDeep(doc)
+      if (!cryptDoc.createDate) {
+        cryptDoc.createDate = new Date()
+      }
       this.convertEncrypt(cryptDoc)
       this.db.insert(cryptDoc, (err, newDoc) => {
         resolve(this.getResult(err, newDoc))
@@ -78,6 +81,16 @@ export default class NedbHelper {
    */
   async addRange (docs) {
     return new Promise(resolve => {
+      let insertDocs = []
+
+      for (let doc in docs) {
+        let insertDoc = cloneDeep(doc)
+        if (!insertDoc.createDate) {
+          insertDoc.createDate = new Date()
+        }
+        insertDocs.push(insertDoc)
+      }
+
       this.db.insert(docs, (err, newDocs) => {
         resolve(this.getResult(err, newDocs))
       })
@@ -124,6 +137,9 @@ export default class NedbHelper {
         resolve(this.getResult('_id가 없습니다.', 0))
       }
       let cryptDoc = cloneDeep(doc)
+      if (!cryptDoc.createDate) {
+        cryptDoc.createDate = new Date()
+      }
       this.convertEncrypt(cryptDoc)
       this.db.update({ _id: cryptDoc._id }, cryptDoc, {}, (err, numAffected) => {
         resolve(this.getResult(err, numAffected))
@@ -156,6 +172,11 @@ export default class NedbHelper {
   async findOne (id) {
     return new Promise(resolve => {
       this.db.findOne({ _id: id }, (err, doc) => {
+        if (doc) {
+          // 복호화
+          this.convertDecrypt(doc)
+        }
+
         resolve(this.getResult(err, doc))
       })
     })

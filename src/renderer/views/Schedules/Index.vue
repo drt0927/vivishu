@@ -238,15 +238,7 @@ export default {
 
       await this.find()
       this.modal.show = false
-      this.$swal({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        icon: 'success',
-        title: this.modal.type === 1 ? '일정 정보 추가 완료' : '일정 정보 수정 완료'
-      })
+      this.$utils.sweetAlert.showToast(this, (this.modal.type === 1 ? '일정 정보 추가 완료' : '일정 정보 수정 완료'), 'success')
     }
   }
 }

@@ -85,15 +85,7 @@ export default {
         return
       }
 
-      this.$swal({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        icon: 'success',
-        title: '지점 정보 추가 완료'
-      })
+      this.$utils.sweetAlert.showToast(this, '지점 정보 추가 완료', 'success')
 
       this.goList()
     },
@@ -108,15 +100,7 @@ export default {
         return
       }
 
-      this.$swal({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true,
-        icon: 'success',
-        title: '지점 정보 수정 완료'
-      })
+      this.$utils.sweetAlert.showToast(this, '지점 정보 수정 완료', 'success')
 
       this.goList()
     },

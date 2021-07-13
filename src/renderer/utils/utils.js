@@ -209,11 +209,62 @@ const structures = {
   // #endregion
 }
 
+const sweetAlert = {
+  showToast (vm, title, icon, position, showConfirm, timer, showProgressBar) {
+    if (!title) {
+      console.error('$utils.sweetAlert - showToast : title is not defined')
+    }
+
+    if (!icon) {
+      console.error('$utils.sweetAlert - showToast : icon is not defined')
+    }
+
+    position = position || 'top-end'
+    showConfirm = showConfirm || false
+    timer = timer || 2000
+    showProgressBar = showProgressBar || false
+
+    vm.$swal({
+      toast: true,
+      position: position,
+      showConfirmButton: showConfirm,
+      timer: timer,
+      timerProgressBar: showProgressBar,
+      icon: icon,
+      title: title
+    })
+  },
+  showAlert (vm, title, icon, position, showConfirm, timer, showProgressBar) {
+    if (!title) {
+      console.error('$utils.sweetAlert - showAlert : title is not defined')
+    }
+
+    if (!icon) {
+      console.error('$utils.sweetAlert - showAlert : icon is not defined')
+    }
+
+    position = position || 'top-end'
+    showConfirm = showConfirm || false
+    timer = timer || 2000
+    showProgressBar = showProgressBar || false
+
+    vm.$swal({
+      position: position,
+      showConfirmButton: showConfirm,
+      timer: timer,
+      timerProgressBar: showProgressBar,
+      icon: icon,
+      title: title
+    })
+  }
+}
+
 export default {
   common,
   masking,
   check,
   crypt,
   structures,
-  enums
+  enums,
+  sweetAlert
 }
