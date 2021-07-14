@@ -112,7 +112,6 @@ export default {
       this.$router.push({ path: '/register' })
     }
 
-    console.log(this.account)
     this.$utils.common.getElement(this, 'pwd').focus()
   }
 }

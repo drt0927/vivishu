@@ -3,7 +3,7 @@
     <transition name="fade">
       <CCard>
         <CCardHeader>
-          <strong>고객 관리 </strong> <small>목록</small>
+          <strong>지점 관리 </strong> <small>목록</small>
           <div class="card-header-actions">
             <CLink class="card-header-action btn-minimize" @click="bind.isCollapsed = !bind.isCollapsed">
               <CIcon :name="`cil-chevron-${bind.isCollapsed ? 'bottom' : 'top'}`"/>
@@ -15,27 +15,27 @@
             <CRow>
               <CCol sm="6">
                 <CInput
-                  label="이름"
-                  placeholder="이름을 입력해 주세요. [like]"
-                  v-model="table.search.name"
+                  label="지점명"
+                  placeholder="지점명을 입력해 주세요. [like]"
+                  v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
                 <CInput
                   label="연락처"
-                  placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="table.search.contact"
+                  placeholder="연락처를 입력해 주세요. [like]"
+                  v-model="search.contact.value"
                   @keyup.enter="find"
                 />
               </CCol>
             </CRow>
             <CRow>
               <CCol sm="6">
-                <CSelect
-                  label="행사 알림"
-                  :value.sync="table.search.isEventAlarm"
-                  :options="bind.isEventAlarmOptions"
+                <CInput
+                  label="매니저"
+                  placeholder="매니저를 입력해 주세요. [like]"
+                  v-model="search.owner.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -43,7 +43,7 @@
                 <CInput
                   label="메모"
                   placeholder="메모를 입력해 주세요. [like]"
-                  v-model="table.search.description"
+                  v-model="search.description.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -56,23 +56,19 @@
         </CCardFooter>
       </CCard>
     </transition>
+
     <CCard>
       <CDataTable
-        :items="table.rows"
-        :fields="table.fields"
-        :items-per-page="table.perPage"
+        :items="list.rows"
+        :fields="list.fields"
+        :items-per-page="list.perPage"
         hover
       >
-        <template #contact="{item}">
+        <template #owner="{item}">
           <td>
-            <span v-c-tooltip="{content: item.address}">
-              {{$utils.masking.phone(item.contact)}}
+            <span v-c-tooltip="{content: item.description}">
+              {{item.owner}}
             </span>
-          </td>
-        </template>
-        <template #isEventAlarm="{item}">
-          <td>
-            <h5><CBadge :color="item.isEventAlarm ? 'success' : 'danger'" v-c-tooltip="{content: item.description}">{{item.isEventAlarm ? "알림" : "미알림"}}</CBadge></h5>
           </td>
         </template>
         <template #btnDetail="{item}">
@@ -91,8 +87,8 @@
       </CDataTable>
       
       <CPagination
-        :activePage.sync="table.currentPage"
-        :pages="table.totalPages"
+        :activePage.sync="list.currentPage"
+        :pages="list.totalPages"
         align="center"
       />
     </CCard>
@@ -101,64 +97,67 @@
 
 <script>
 export default {
-  name: 'customers',
+  name: 'stores',
   data () {
     return {
-      date: new Date(),
-      table: {
+      bind: {
+        isCollapsed: true
+      },
+      search: {
+        name: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        contact: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        owner: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        description: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        }
+      },
+      list: {
         rows: [],
         fields: [
-          { key: 'name', label: '이름' },
+          { key: 'name', label: '지점명' },
           { key: 'contact', label: '연락처' },
-          { key: 'isEventAlarm', label: '행사알림' },
+          { key: 'deliveryCode', label: '배송코드' },
+          { key: 'owner', label: '매니저' },
           { key: 'btnDetail', label: '상세' }
         ],
         currentPage: 1,
         perPage: 15,
-        totalPages: 0,
-        search: {
-          name: '',
-          contact: '',
-          isEventAlarm: '',
-          description: '',
-          getQuery () {
-            return {
-              name: !this.name ? '' : { $regex: new RegExp(this.name) },
-              contact: this.contact,
-              isEventAlarm: this.isEventAlarm,
-              description: !this.description ? '' : { $regex: new RegExp(this.description) }
-            }
-          }
-        }
-      },
-      bind: {
-        isEventAlarmOptions: [
-          { value: '', label: '전체' },
-          { value: true, label: '알림' },
-          { value: false, label: '미알림' }
-        ],
-        isCollapsed: true
+        totalPages: 0
       }
     }
   },
   watch: {
-    'table.currentPage': async function () {
-      await this.find()
+    'list.currentPage': function () {
+      this.find()
     }
   },
   methods: {
     async find () {
-      await this.$db.customers2.findForTable(this.table)
+      let db = this.$db.stores
+      await db.find(
+        this.search
+        , { name: 1 }
+        , this.list)
     },
     goWrite () {
-      this.$router.push({ path: '/customers/write' })
+      this.$router.push({ path: '/stores/write' })
     },
     goDetail (id) {
-      this.$router.push({ path: `/customers/${id}` })
+      this.$router.push({ path: `/stores/${id}` })
     }
   },
-  async mounted () {
-    await this.find()
+  mounted () {
+    this.find()
   }
 }
 </script>

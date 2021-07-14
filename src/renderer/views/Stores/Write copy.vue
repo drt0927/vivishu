@@ -61,8 +61,8 @@ export default {
   data () {
     return {
       id: this.$route.params.id,
-      db: this.$db.stores2,
-      store: this.$db.stores2.getDocument()
+      db: this.$db.stores,
+      store: this.$db.stores.getNewDocument()
     }
   },
   methods: {
@@ -74,11 +74,11 @@ export default {
       }
     },
     async add () {
-      if (!this.valid()) {
+      if (!this.db.valid(this, this.store)) {
         return
       }
 
-      let insert = await this.db.add(this.store) // insert
+      let insert = await this.db.insert(this.store) // insert
       if (!insert.isSuccess) {
         console.log(insert.result)
         alert('지점 정보 추가를 실패하였습니다.')
@@ -90,11 +90,11 @@ export default {
       this.goList()
     },
     async modify () {
-      if (!this.valid()) {
+      if (!this.db.valid(this, this.store)) {
         return
       }
 
-      let update = await this.db.update(this.store)
+      let update = await this.db.update(this.id, this.store)
       if (!update.isSuccess) {
         alert('지점 정보 수정을 실패하였습니다.')
         return
@@ -110,34 +110,24 @@ export default {
       } else {
         this.$router.push({ path: '/stores' })
       }
-    },
-    valid () {
-      if (!this.store.name) {
-        alert(`[지점명]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'name').focus()
-        return false
-      }
-
-      if (!this.$utils.check.call(this.store.contact)) {
-        alert('[연락처] 형식이 올바르지 않습니다. 숫자 10~11자리 입니다.')
-        this.$utils.common.getElement(this, 'contact').focus()
-        return false
-      }
-
-      return true
     }
   },
   async mounted () {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.id) {
-      let find = await this.db.findOne(this.id)
+      let find = await this.db.findOne({
+        _id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: this.id
+        }
+      })
       if (!find.isSuccess) {
         alert(find.result)
         return
       }
 
-      this.store = find.result
+      this.store = find.result[0]
     }
   }
 }

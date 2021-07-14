@@ -17,14 +17,14 @@
                 <CInput
                   label="주문자명"
                   placeholder="주문자명을 입력해 주세요. [like]"
-                  v-model="search.name.value"
+                  v-model="table.search.name"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
                 <CSelect
                   label="구분"
-                  :value.sync="search.type.value"
+                  :value.sync="table.search.type"
                   :options="bind.type"
                   @keyup.enter="find"
                 />
@@ -34,7 +34,7 @@
               <CCol sm="6">
                 <CSelect
                   label="배송완료"
-                  :value.sync="search.deliveryCompletedDate.value"
+                  :value.sync="table.search.deliveryCompletedDate"
                   :options="bind.deliveryCompletedDate"
                   @keyup.enter="find"
                 />
@@ -43,7 +43,7 @@
                 <CInput
                   label="송장번호"
                   placeholder="송장번호를 입력해 주세요. [like]"
-                  v-model="search.deliveryNo.value"
+                  v-model="table.search.deliveryNo"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -59,9 +59,9 @@
 
     <CCard>
       <CDataTable
-        :items="list.rows"
-        :fields="list.fields"
-        :items-per-page="list.perPage"
+        :items="table.rows"
+        :fields="table.fields"
+        :items-per-page="table.perPage"
         hover
       >
         <template #createDate="{item}">
@@ -71,7 +71,7 @@
         </template>
         <template #type="{item}">
           <td>
-            <h5><CBadge :style="getTypeColor(item.type)" >{{getTypeString(item.type)}}</CBadge></h5>
+            <h5><CBadge :style="getTypeConvert(item.type).style" >{{getTypeConvert(item.type).lable}}</CBadge></h5>
           </td>
         </template>
         <template #releaseDate="{item}">
@@ -104,8 +104,8 @@
       </CDataTable>
       
       <CPagination
-        :activePage.sync="list.currentPage"
-        :pages="list.totalPages"
+        :activePage.sync="table.currentPage"
+        :pages="table.totalPages"
         align="center"
       />
     </CCard>
@@ -131,34 +131,7 @@ export default {
         ],
         isCollapsed: true
       },
-      search: {
-        name: {
-          operator: this.$utils.enums.NedbQueryOperators.Regex,
-          value: ''
-        },
-        type: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: ''
-        },
-        deliveryCompletedDate: {
-          operator: this.$utils.enums.NedbQueryOperators.Where,
-          value: '',
-          callback: function (value) {
-            this.func = function () {
-              if (value === true) {
-                return this.deliveryCompletedDate !== null
-              } else if (value === false) {
-                return this.deliveryCompletedDate === null
-              }
-            }
-          }
-        },
-        deliveryNo: {
-          operator: this.$utils.enums.NedbQueryOperators.Regex,
-          value: ''
-        }
-      },
-      list: {
+      table: {
         rows: [],
         fields: [
           { key: 'createDate', label: '작성일', _style: 'width: 100px;' },
@@ -170,39 +143,61 @@ export default {
         ],
         currentPage: 1,
         perPage: 15,
-        totalPages: 0
+        totalPages: 0,
+        search: {
+          name: '',
+          type: '',
+          deliveryCompletedDate: '',
+          deliveryNo: '',
+          getQuery () {
+            let query = {
+              name: !this.name ? '' : { $regex: new RegExp(this.name) },
+              type: this.type,
+              deliveryNo: !this.deliveryNo ? '' : { $regex: new RegExp(this.deliveryNo) }
+            }
+
+            if (this.deliveryCompletedDate === true) {
+              query.deliveryCompletedDate = { $ne: null }
+            } else if (this.deliveryCompletedDate === false) {
+              query.deliveryCompletedDate = null
+            }
+
+            return query
+          }
+        }
       }
     }
   },
   watch: {
-    'list.currentPage': function () {
-      this.find()
+    'table.currentPage': async function () {
+      await this.find()
     }
   },
   methods: {
     async find () {
-      let db = this.$db.orders
-      await db.find(
-        this.search
-        , { createDate: -1 }
-        , this.list)
+      await this.$db.orders2.findForTable(this.table)
     },
-    getTypeString (type) {
+    getTypeConvert (type) {
       if (type === 1) {
-        return '매장'
+        return {
+          lable: '매장',
+          style: 'background-color: #ccc;'
+        }
       } else if (type === 2) {
-        return '네이버'
+        return {
+          lable: '네이버',
+          style: 'background-color: #19CE60; color: white;'
+        }
       } else if (type === 3) {
-        return '롯데'
-      }
-    },
-    getTypeColor (type) {
-      if (type === 1) {
-        return 'background-color: #ccc;'
-      } else if (type === 2) {
-        return 'background-color: #19CE60; color: white;'
-      } else if (type === 3) {
-        return 'background-color: #E30613; color: white;'
+        return {
+          lable: '롯데',
+          style: 'background-color: #E30613; color: white;'
+        }
+      } else {
+        return {
+          lable: '',
+          style: ''
+        }
       }
     },
     goWrite () {
@@ -212,8 +207,8 @@ export default {
       this.$router.push({ path: `/orders/${id}` })
     }
   },
-  mounted () {
-    this.find()
+  async mounted () {
+    await this.find()
     window.scrollTo(0, 0)
   }
 }

@@ -186,7 +186,6 @@ export default {
     }
 
     this.customer = find.result
-    console.log(this.customer)
   }
 }
 </script>
