@@ -17,14 +17,14 @@
                 <CInput
                   label="지점명"
                   placeholder="지점명을 입력해 주세요. [like]"
-                  v-model="search.name.value"
+                  v-model="table.search.name"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
                 <CSelect
                   label="구분"
-                  :value.sync="search.type.value"
+                  :value.sync="table.search.type"
                   :options="bind.type"
                   @keyup.enter="find"
                 />
@@ -35,14 +35,14 @@
                 <CInput
                   label="품번"
                   placeholder="품번를 입력해 주세요. [like]"
-                  v-model="search.no.value"
+                  v-model="table.search.no"
                   @keyup.enter="find"
                 />
               </CCol>
               <CCol sm="6">
                 <CSelect
                   label="확정여부"
-                  :value.sync="search.isConfirm.value"
+                  :value.sync="table.search.isConfirm"
                   :options="bind.isConfirm"
                   @keyup.enter="find"
                 />
@@ -59,9 +59,9 @@
 
     <CCard>
       <CDataTable
-        :items="list.rows"
-        :fields="list.fields"
-        :items-per-page="list.perPage"
+        :items="table.rows"
+        :fields="table.fields"
+        :items-per-page="table.perPage"
         hover
       >
         <template #createDate="{item}">
@@ -110,8 +110,8 @@
       </CDataTable>
       
       <CPagination
-        :activePage.sync="list.currentPage"
-        :pages="list.totalPages"
+        :activePage.sync="table.currentPage"
+        :pages="table.totalPages"
         align="center"
       />
     </CCard>
@@ -123,38 +123,7 @@ export default {
   name: 'trades',
   data () {
     return {
-      bind: {
-        type: [
-          { value: '', label: '전체' },
-          { value: 1, label: '입고' },
-          { value: 2, label: '출고' }
-        ],
-        isConfirm: [
-          { value: '', label: '전체' },
-          { value: true, label: '확정' },
-          { value: false, label: '미확정' }
-        ],
-        isCollapsed: true
-      },
-      search: {
-        name: {
-          operator: this.$utils.enums.NedbQueryOperators.Regex,
-          value: ''
-        },
-        type: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: ''
-        },
-        no: {
-          operator: this.$utils.enums.NedbQueryOperators.Regex,
-          value: ''
-        },
-        isConfirm: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: ''
-        }
-      },
-      list: {
+      table: {
         rows: [],
         fields: [
           { key: 'createDate', label: '작성일', _style: 'width: 100px;' },
@@ -168,22 +137,45 @@ export default {
         ],
         currentPage: 1,
         perPage: 15,
-        totalPages: 0
+        totalPages: 0,
+        search: {
+          name: '',
+          contact: '',
+          isEventAlarm: '',
+          description: '',
+          getQuery () {
+            return {
+              name: !this.name ? '' : { $regex: new RegExp(this.name) },
+              type: this.type,
+              no: !this.no ? '' : { $regex: new RegExp(this.no) },
+              isConfirm: this.isConfirm
+            }
+          }
+        }
+      },
+      bind: {
+        type: [
+          { value: '', label: '전체' },
+          { value: 1, label: '입고' },
+          { value: 2, label: '출고' }
+        ],
+        isConfirm: [
+          { value: '', label: '전체' },
+          { value: true, label: '확정' },
+          { value: false, label: '미확정' }
+        ],
+        isCollapsed: true
       }
     }
   },
   watch: {
-    'list.currentPage': function () {
-      this.find()
+    'table.currentPage': async function () {
+      await this.find()
     }
   },
   methods: {
     async find () {
-      let db = this.$db.trades
-      await db.find(
-        this.search
-        , { createDate: -1 }
-        , this.list)
+      await this.$db.trades.findForTable(this.table)
     },
     getTypeStyle (type) {
       if (type === 1) {
@@ -207,8 +199,8 @@ export default {
       this.$router.push({ path: `/trades/${id}` })
     }
   },
-  mounted () {
-    this.find()
+  async mounted () {
+    await this.find()
     window.scrollTo(0, 0)
   }
 }

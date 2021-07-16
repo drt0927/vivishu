@@ -4,6 +4,7 @@ import stores from './stores'
 import orders from './orders'
 import schedules from './schedules'
 import trades from './trades'
+import todos from './todos'
 
 const db = {
   accounts,
@@ -11,7 +12,8 @@ const db = {
   stores,
   orders,
   schedules,
-  trades
+  trades,
+  todos
 }
 
 export default db

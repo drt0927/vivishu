@@ -83,15 +83,16 @@ export default class NedbHelper {
     return new Promise(resolve => {
       let insertDocs = []
 
-      for (let doc in docs) {
+      for (let doc of docs) {
         let insertDoc = cloneDeep(doc)
         if (!insertDoc.createDate) {
           insertDoc.createDate = new Date()
         }
+        this.convertEncrypt(insertDoc)
         insertDocs.push(insertDoc)
       }
 
-      this.db.insert(docs, (err, newDocs) => {
+      this.db.insert(insertDocs, (err, newDocs) => {
         resolve(this.getResult(err, newDocs))
       })
     })
@@ -210,6 +211,16 @@ export default class NedbHelper {
         .sort(sort)
         .skip(skip)
         .limit(limit)
+        .exec((err, docs) => {
+          resolve(this.getResult(err, docs))
+        })
+    })
+  }
+
+  async findByQuery (query) {
+    return new Promise(resolve => {
+      this.db
+        .find(query)
         .exec((err, docs) => {
           resolve(this.getResult(err, docs))
         })

@@ -89,8 +89,16 @@ export default new Router({
         },
         {
           path: '/todos',
+          redirect: '/todos',
           name: 'Todo',
-          component: require('@/views/Todos').default
+          component: require('@/views/Todos/Todos').default,
+          children: [
+            {
+              path: '/todos',
+              name: 'Todo 목록',
+              component: require('@/views/Todos/Index').default
+            }
+          ]
         },
         {
           path: '/orders',

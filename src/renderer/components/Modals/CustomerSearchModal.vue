@@ -17,7 +17,7 @@
                 <CInput
                   label="이름"
                   placeholder="이름을 입력해 주세요. [like]"
-                  v-model="search.name.value"
+                  v-model="table.search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -25,7 +25,7 @@
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="search.contact.value"
+                  v-model="table.search.contact.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -34,7 +34,7 @@
               <CCol sm="6">
                 <CSelect
                   label="행사 알림"
-                  :value.sync="search.isEventAlarm.value"
+                  :value.sync="table.search.isEventAlarm.value"
                   :options="bind.isEventAlarmOptions"
                   @keyup.enter="find"
                 />
@@ -43,7 +43,7 @@
                 <CInput
                   label="설명"
                   placeholder="설명을 입력해 주세요. [like]"
-                  v-model="search.description.value"
+                  v-model="table.search.description.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -58,9 +58,9 @@
     </transition>
     <CCard>
       <CDataTable
-        :items="list.rows"
-        :fields="list.fields"
-        :items-per-page="list.perPage"
+        :items="table.rows"
+        :fields="table.fields"
+        :items-per-page="table.perPage"
         @row-clicked="selected"
         hover
         >
@@ -79,8 +79,8 @@
       </CDataTable>
       
       <CPagination
-        :activePage.sync="list.currentPage"
-        :pages="list.totalPages"
+        :activePage.sync="table.currentPage"
+        :pages="table.totalPages"
         align="center"
       />
     </CCard>
@@ -95,34 +95,7 @@ export default {
   name: 'customer-search-modal',
   data () {
     return {
-      date: new Date(),
-      bind: {
-        isEventAlarmOptions: [
-          { value: '', label: '전체' },
-          { value: true, label: '알림' },
-          { value: false, label: '미알림' }
-        ],
-        isCollapsed: true
-      },
-      search: {
-        name: {
-          operator: this.$utils.enums.NedbQueryOperators.Regex,
-          value: ''
-        },
-        contact: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: ''
-        },
-        isEventAlarm: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: ''
-        },
-        description: {
-          operator: this.$utils.enums.NedbQueryOperators.Regex,
-          value: ''
-        }
-      },
-      list: {
+      table: {
         rows: [],
         fields: [
           { key: 'name', label: '이름' },
@@ -131,31 +104,50 @@ export default {
         ],
         currentPage: 1,
         perPage: 15,
-        totalPages: 0
+        totalPages: 0,
+        search: {
+          name: '',
+          contact: '',
+          isEventAlarm: '',
+          description: '',
+          getQuery () {
+            return {
+              name: !this.name ? '' : { $regex: new RegExp(this.name) },
+              contact: this.contact,
+              isEventAlarm: this.isEventAlarm,
+              description: !this.description ? '' : { $regex: new RegExp(this.description) }
+            }
+          }
+        }
+      },
+      bind: {
+        isEventAlarmOptions: [
+          { value: '', label: '전체' },
+          { value: true, label: '알림' },
+          { value: false, label: '미알림' }
+        ],
+        isCollapsed: true
       }
     }
   },
   methods: {
     async find () {
-      let db = this.$db.customers
-      await db.find(
-        this.search
-        , { name: 1 }
-        , this.list)
+      await this.$db.customers.findForTable(this.table)
     },
     selected (item) {
-      this.$emit('selected', item._id, item.name)
+      console.log(item)
+      this.$emit('selected', item._id, item.name, item.address)
       this.isShow = false
     },
     goWrite () {
       this.$router.push({ path: '/customers/write' })
     }
   },
-  mounted () {
-    this.find()
+  async mounted () {
+    await this.find()
   },
   watch: {
-    'list.currentPage': function () {
+    'table.currentPage': function () {
       this.find()
     }
   },

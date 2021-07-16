@@ -78,9 +78,9 @@ export default {
         return
       }
 
-      let insert = await this.db.add(this.store) // insert
-      if (!insert.isSuccess) {
-        console.log(insert.result)
+      let add = await this.db.add(this.store) // insert
+      if (!add.isSuccess) {
+        console.log(add.result)
         alert('지점 정보 추가를 실패하였습니다.')
         return
       }

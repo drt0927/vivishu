@@ -13,11 +13,11 @@
             ref="name"
             readonly
             v-model="trade.name"
-            @keyup.enter="modal.storeSearchModalShow = true"
-            @click="modal.storeSearchModalShow = true"
+            @keyup.enter="bind.storeSearchModalShow = true"
+            @click="bind.storeSearchModalShow = true"
           >
           <template #append>
-            <CButton type="button" color="info" @click="modal.storeSearchModalShow = true">검색</CButton>
+            <CButton type="button" color="info" @click="bind.storeSearchModalShow = true">검색</CButton>
           </template>
           </CInput>
           <CSelect
@@ -90,7 +90,7 @@
         <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
       </CCardFooter>
     </CCard>
-    <store-search-modal :show.sync="modal.storeSearchModalShow" @selected="storeSearchSelected"/>
+    <store-search-modal :show.sync="bind.storeSearchModalShow" @selected="storeSearchSelected"/>
   </div>
 </template>
 
@@ -107,12 +107,10 @@ export default {
         type: [
           { value: 1, label: '입고' },
           { value: 2, label: '출고' }
-        ]
-      },
-      modal: {
+        ],
         storeSearchModalShow: false
       },
-      trade: this.$db.trades.getNewDocument(),
+      trade: this.$db.trades.getDocument(),
       tradeProducts: [],
       productsFields: [
         { key: 'no', label: '품번 *' },
@@ -129,11 +127,11 @@ export default {
   methods: {
     async add () {
       let trades = this.convertTradeModel()
-      if (!this.db.validAdd(this, trades)) {
+      if (!this.validAdd(trades)) {
         return
       }
 
-      let insert = await this.db.insertRange(trades)
+      let insert = await this.db.addRange(trades)
       if (!insert.isSuccess) {
         console.log(insert.result)
         alert('수평이동 정보 추가를 실패하였습니다.')
@@ -182,9 +180,47 @@ export default {
     storeSearchSelected (id, name) {
       this.trade.storeId = id
       this.trade.name = name
+    },
+    validAdd (docs) {
+      let result = true
+
+      if (docs.length < 1) {
+        alert(`[상품]은(는) 1개 이상 필수 입력 입니다.`)
+        return false
+      }
+
+      for (let doc of docs) {
+        if (!this.validOne(doc)) {
+          result = false
+          break
+        }
+      }
+
+      return result
+    },
+    validOne (doc) {
+      if (!doc.storeId) {
+        alert(`[지점]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'name').focus()
+        return false
+      }
+
+      if (!doc.no) {
+        alert(`[품번]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'no').focus()
+        return false
+      }
+
+      if (!doc.amount) {
+        alert(`[수량]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'amount').focus()
+        return false
+      }
+
+      return true
     }
   },
-  async mounted () {
+  mounted () {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.$route.query.storeId) {

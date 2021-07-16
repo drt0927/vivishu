@@ -104,7 +104,6 @@ export default {
   name: 'customers',
   data () {
     return {
-      date: new Date(),
       table: {
         rows: [],
         fields: [

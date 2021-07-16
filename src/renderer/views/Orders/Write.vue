@@ -13,11 +13,11 @@
             ref="name"
             readonly
             v-model="order.name"
-            @keyup.enter="modal.customerSearchModalShow = true"
-            @click="modal.customerSearchModalShow = true"
+            @keyup.enter="bind.customerSearchModalShow = true"
+            @click="bind.customerSearchModalShow = true"
           >
           <template #append>
-            <CButton type="button" color="info" @click="modal.customerSearchModalShow = true">검색</CButton>
+            <CButton type="button" color="info" @click="bind.customerSearchModalShow = true">검색</CButton>
           </template>
           </CInput>
           <CInput
@@ -29,7 +29,7 @@
             @keyup.enter="excute"
           >
             <template #append>
-              <CButton type="button" color="info" @click="modal.addressSearchModalShow = true">검색</CButton>
+              <CButton type="button" color="info" @click="bind.addressSearchModalShow = true">검색</CButton>
             </template>
           </CInput>
           <CSelect
@@ -129,8 +129,8 @@
         <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
       </CCardFooter>
     </CCard>
-    <address-search-modal :show.sync="modal.addressSearchModalShow" @complete="addressSearchComplete"/>
-    <customer-search-modal :show.sync="modal.customerSearchModalShow" @selected="customerSearchSelected"/>
+    <address-search-modal :show.sync="bind.addressSearchModalShow" @complete="addressSearchComplete"/>
+    <customer-search-modal :show.sync="bind.customerSearchModalShow" @selected="customerSearchSelected"/>
   </div>
 </template>
 
@@ -155,13 +155,11 @@ export default {
           { value: 0, label: '기타' },
           { value: 1, label: '롯데' },
           { value: 2, label: '로젠' }
-        ]
-      },
-      modal: {
+        ],
         addressSearchModalShow: false,
         customerSearchModalShow: false
       },
-      order: this.$db.orders.getNewDocument(),
+      order: this.$db.orders.getDocument(),
       productsFields: [
         { key: 'no', label: '품번' },
         { key: 'amount', label: '수량' },
@@ -184,13 +182,13 @@ export default {
       }
     },
     async add () {
-      if (!this.db.valid(this, this.order)) {
+      if (!this.valid()) {
         return
       }
 
-      let insert = await this.db.insert(this.order) // insert
-      if (!insert.isSuccess) {
-        console.log(insert.result)
+      let add = await this.db.add(this.order)
+      if (!add.isSuccess) {
+        console.log(add.result)
         alert('주문장 정보 추가를 실패하였습니다.')
         return
       }
@@ -200,11 +198,11 @@ export default {
       this.goList()
     },
     async modify () {
-      if (!this.db.valid(this, this.order)) {
+      if (!this.valid()) {
         return
       }
 
-      let update = await this.db.update(this.id, this.order)
+      let update = await this.db.update(this.order)
       if (!update.isSuccess) {
         alert('주문장 정보 수정을 실패하였습니다.')
         return
@@ -240,32 +238,61 @@ export default {
     addressSearchComplete (addr) {
       this.order.address = addr
     },
-    customerSearchSelected (id, name) {
+    customerSearchSelected (id, name, address) {
       this.order.customerId = id
       this.order.name = name
+      this.order.address = address
+    },
+    valid () {
+      if (!this.order.customerId) {
+        alert(`[주문자]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'name').focus()
+        return false
+      }
+
+      if (!this.order.address) {
+        alert(`[주소]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'address').focus()
+        return false
+      }
+
+      if (this.order.products.length < 1) {
+        alert(`[상품]은(는) 필수 값 입니다.\r\n1개 이상의 상품을 등록해 주세요.`)
+        if (this.order.products.length < 1) {
+          this.addProduct()
+        } else {
+          this.$utils.common.getElement(this, 'no').focus()
+        }
+
+        return false
+      }
+
+      return true
     }
   },
   async mounted () {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.id) {
-      let find = await this.db.findOne({
-        _id: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: this.id
-        }
-      })
+      let find = await this.db.findOne(this.id)
       if (!find.isSuccess) {
         alert(find.result)
         return
       }
 
-      this.order = find.result[0]
+      this.order = find.result
     }
 
     if (this.$route.query.customerId) {
-      this.order.customerId = this.$route.query.customerId
-      this.order.name = this.$route.query.name
+      let customer = await this.$db.customers.findOne(this.$route.query.customerId)
+      if (!customer.isSuccess) {
+        alert(customer.result)
+        return
+      }
+
+      this.order.customerId = customer._id
+      this.order.name = customer.name
+      this.order.address = customer.address
     }
   }
 }

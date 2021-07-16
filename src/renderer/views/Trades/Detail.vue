@@ -91,7 +91,7 @@ export default {
           { value: 2, label: '출고' }
         ]
       },
-      trade: this.$db.trades.getNewDocument()
+      trade: {}
     }
   },
   methods: {
@@ -116,19 +116,13 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.trades.findOne({
-      _id: {
-        operator: this.$utils.enums.NedbQueryOperators.Equal,
-        value: this.id
-      }
-    })
+    let find = await this.$db.trades.findOne(this.id)
     if (!find.isSuccess) {
       alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()
     }
 
-    this.trade = find.result[0]
-    console.log(this.id, this.trade)
+    this.trade = find.result
   }
 }
 </script>

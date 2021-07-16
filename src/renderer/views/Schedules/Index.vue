@@ -4,13 +4,13 @@
       <CCardHeader>
         <strong>일정 관리</strong>
         <div class="card-header-actions">
-          <CButton type="button" size="sm" color="primary" @click="add">추가</CButton>
+          <CButton type="button" size="sm" color="primary" @click="addModal">추가</CButton>
         </div>
       </CCardHeader>
       <CCardBody>
         <calendar-view
-          :show-date="calendar.today"
-          :items="calendar.list.rows"
+          :show-date="today"
+          :items="table.rows"
           :enableDragDrop="true"
           @click-date="dateClicked"
           @click-item="itemClicked"
@@ -83,7 +83,8 @@
       </CForm>
       <template #footer>
         <div style="width: 100%">
-          <CButton type="button" size="sm" color="primary" class="float-left" @click="excute">{{modal.schedule._id ? '수정' : '추가'}}</CButton>
+          <CButton type="button" size="sm" color="primary" @click="excute">{{modal.schedule._id ? '수정' : '추가'}}</CButton>
+          <CButton type="button" v-show="modal.schedule._id ? true : false" size="sm" color="danger" @click="remove">삭제</CButton>
           <CButton type="submit" size="sm" color="secondary" class="float-right" @click="modal.show = false">닫기</CButton>
         </div>
       </template>
@@ -99,23 +100,23 @@ export default {
   name: 'schedules',
   data () {
     return {
-      calendar: {
-        today: new Date(),
-        list: {
-          rows: [],
-          fields: [],
-          currentPage: 1,
-          perPage: 999,
-          totalPages: 0
-        },
+      today: new Date(),
+      table: {
+        rows: [],
+        fields: [],
+        currentPage: 1,
+        perPage: 999,
+        totalPages: 0,
         search: {
-          startDate: {
-            operator: this.$utils.enums.NedbQueryOperators.LessThanEqual,
-            value: null
-          },
-          endDate: {
-            operator: this.$utils.enums.NedbQueryOperators.GraterThanEqual,
-            value: null
+          startDate: null,
+          endDate: null,
+          getQuery () {
+            let query = {
+              startDate: !this.startDate ? '' : { $lte: this.startDate },
+              endDate: !this.endDate ? '' : { $gte: this.endDate }
+            }
+
+            return query
           }
         }
       },
@@ -135,7 +136,7 @@ export default {
         title: '일정 정보',
         class: '',
         type: 0,
-        schedule: this.$db.schedules.getNewDocument()
+        schedule: this.$db.schedules.getDocument()
       }
     }
   },
@@ -146,10 +147,10 @@ export default {
   },
   methods: {
     setShowDate (d) {
-      this.calendar.today = d
+      this.today = d
     },
     dateClicked (date) { // items, event
-      this.modal.schedule = this.$db.schedules.getNewDocument()
+      this.modal.schedule = this.$db.schedules.getDocument()
       this.modal.schedule.startDate = date
       this.modal.schedule.endDate = date
       this.modal.class = ''
@@ -178,19 +179,15 @@ export default {
       this.modal.class = itemClasses
     },
     async find () {
-      let db = this.$db.schedules
-      await db.find(
-        this.calendar.search
-        , { id: -1 }
-        , this.calendar.list)
+      await this.$db.schedules.findForTable(this.table)
     },
     async periodChanged (d) {
-      this.calendar.search.startDate.value = d.displayLastDate
-      this.calendar.search.endDate.value = d.displayFirstDate
+      this.table.search.startDate = d.displayLastDate
+      this.table.search.endDate = d.displayFirstDate
 
       await this.find()
     },
-    add () {
+    addModal () {
       this.dateClicked(new Date())
     },
     async dropedItem (item, date, event) {
@@ -215,21 +212,21 @@ export default {
       await this.excute()
     },
     async excute () {
-      if (!this.$db.schedules.valid(this, this.modal.schedule)) {
+      if (!this.valid()) {
         return
       }
 
       if (this.modal.type === 1) {
         // 추가
-        let insert = await this.$db.schedules.insert(this.modal.schedule) // insert
-        if (!insert.isSuccess) {
-          console.log(insert.result)
+        let add = await this.$db.schedules.add(this.modal.schedule)
+        if (!add.isSuccess) {
+          console.log(add.result)
           alert('일정 정보 추가를 실패하였습니다.')
           return
         }
       } else if (this.modal.type === 2) {
         // 수정
-        let update = await this.$db.schedules.update(this.modal.schedule._id, this.modal.schedule)
+        let update = await this.$db.schedules.update(this.modal.schedule)
         if (!update.isSuccess) {
           alert('일정 정보 수정을 실패하였습니다.')
           return
@@ -239,6 +236,38 @@ export default {
       await this.find()
       this.modal.show = false
       this.$utils.sweetAlert.showToast(this, (this.modal.type === 1 ? '일정 정보 추가 완료' : '일정 정보 수정 완료'), 'success')
+    },
+    async remove () {
+      if (confirm('삭제하시겠습니까?')) {
+        let remove = await this.$db.schedules.remove(this.modal.schedule._id)
+        if (!remove.isSuccess) {
+          alert('일정 정보를 삭제하지 못했습니다.')
+          return
+        }
+
+        await this.find()
+        this.modal.show = false
+        this.$utils.sweetAlert.showToast(this, '일정 정보 삭제 완료', 'success')
+      }
+    },
+    valid () {
+      if (!this.modal.schedule.title) {
+        alert(`[제목]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'title').focus()
+        return false
+      }
+
+      if (!this.modal.schedule.startDate) {
+        alert(`[시작일]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'startDate').focus()
+        return false
+      }
+
+      if (!this.modal.schedule.endDate) {
+        this.modal.schedule.endDate = this.modal.schedule.startDate
+      }
+
+      return true
     }
   }
 }

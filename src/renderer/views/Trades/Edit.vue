@@ -94,7 +94,7 @@ export default {
       modal: {
         storeSearchModalShow: false
       },
-      trade: this.$db.trades.getNewDocument(),
+      trade: {},
       tradeProducts: [],
       productsFields: [
         { key: 'no', label: '품번 *' },
@@ -110,11 +110,11 @@ export default {
   },
   methods: {
     async modify () {
-      if (!this.db.validOne(this, this.trade)) {
+      if (!this.validOne()) {
         return
       }
 
-      let update = await this.db.update(this.id, this.trade)
+      let update = await this.db.update(this.trade)
       if (!update.isSuccess) {
         alert('수평이동 정보 추가를 실패하였습니다.')
         return
@@ -130,24 +130,40 @@ export default {
     storeSearchSelected (id, name) {
       this.trade.storeId = id
       this.trade.name = name
+    },
+    validOne () {
+      if (!this.trade.storeId) {
+        alert(`[지점]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'name').focus()
+        return false
+      }
+
+      if (!this.trade.no) {
+        alert(`[품번]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'no').focus()
+        return false
+      }
+
+      if (!this.trade.amount) {
+        alert(`[수량]은(는) 필수 값 입니다.`)
+        this.$utils.common.getElement(this, 'amount').focus()
+        return false
+      }
+
+      return true
     }
   },
   async mounted () {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.id) {
-      let find = await this.db.findOne({
-        _id: {
-          operator: this.$utils.enums.NedbQueryOperators.Equal,
-          value: this.id
-        }
-      })
+      let find = await this.db.findOne(this.id)
       if (!find.isSuccess) {
         alert(find.result)
         return
       }
 
-      this.trade = find.result[0]
+      this.trade = find.result
     }
   }
 }

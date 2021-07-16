@@ -81,7 +81,7 @@
         </template>
         <template #products="{item}">
           <td>
-              <ul class="products-list">
+              <ul class="products-list" v-c-tooltip="{content: item.description}">
                 <li v-for="product in item.products" v-bind:key="product._id">
                   {{product.no}} [ <b>{{product.amount}}</b> - <i>{{product.description}}</i> ]
                 </li>
@@ -159,7 +159,7 @@ export default {
             if (this.deliveryCompletedDate === true) {
               query.deliveryCompletedDate = { $ne: null }
             } else if (this.deliveryCompletedDate === false) {
-              query.deliveryCompletedDate = null
+              query.deliveryCompletedDate = { $in: [null] }
             }
 
             return query

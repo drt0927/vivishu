@@ -66,7 +66,7 @@
         />
       </CCardBody>
       <CCardHeader>
-        <strong>상품 등록</strong>
+        <strong>상품 목록</strong>
       </CCardHeader>
       <CCardBody style="padding: 0;">
         <CDataTable
@@ -128,7 +128,7 @@ export default {
           { value: 2, label: '로젠' }
         ]
       },
-      order: this.$db.orders.getNewDocument(),
+      order: {},
       productsFields: [
         { key: 'no', label: '품번' },
         { key: 'amount', label: '수량' },
@@ -158,18 +158,13 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.orders.findOne({
-      _id: {
-        operator: this.$utils.enums.NedbQueryOperators.Equal,
-        value: this.id
-      }
-    })
+    let find = await this.$db.orders.findOne(this.id)
     if (!find.isSuccess) {
       alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()
     }
 
-    this.order = find.result[0]
+    this.order = find.result
   }
 }
 </script>
