@@ -74,8 +74,8 @@ export default {
   data () {
     return {
       id: this.$route.params.id,
-      db: this.$db.customers2,
-      customer: this.$db.customers2.getDocument(),
+      db: this.$db.customers,
+      customer: this.$db.customers.getNewDocument(),
       modal: {
         show: false
       }
@@ -93,13 +93,13 @@ export default {
       }
     },
     async add () {
-      if (!this.valid()) {
+      if (!this.db.valid(this, this.customer)) {
         return
       }
 
-      let add = await this.db.add(this.customer)
-      if (!add.isSuccess) {
-        console.log(add.result)
+      let insert = await this.db.insert(this.customer) // insert
+      if (!insert.isSuccess) {
+        console.log(insert.result)
         alert('고객 정보 추가를 실패하였습니다.')
         return
       }
@@ -109,11 +109,11 @@ export default {
       this.goList()
     },
     async modify () {
-      if (!this.valid()) {
+      if (!this.db.valid(this, this.customer)) {
         return
       }
 
-      let update = await this.db.update(this.customer)
+      let update = await this.db.update(this.id, this.customer)
       if (!update.isSuccess) {
         alert('고객 정보 수정을 실패하였습니다.')
         return
@@ -122,27 +122,6 @@ export default {
       this.$utils.sweetAlert.showToast(this, '고객 정보 수정 완료', 'success')
 
       this.goList()
-    },
-    valid () {
-      if (!this.customer.name) {
-        alert(`[이름]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'name').focus()
-        return false
-      }
-
-      if (!this.customer.contact) {
-        alert(`[연락처]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'contact').focus()
-        return false
-      }
-
-      if (!this.$utils.check.phone(this.customer.contact) && !this.$utils.check.call(this.customer.contact)) {
-        alert('[연락처] 형식이 올바르지 않습니다. 숫자 10~11자리 입니다.')
-        this.$utils.common.getElement(this, 'contact').focus()
-        return false
-      }
-
-      return true
     },
     goList () {
       if (this.id) {
@@ -159,13 +138,18 @@ export default {
     this.$utils.common.getElement(this, 'name').focus()
 
     if (this.id) {
-      let find = await this.db.findOne(this.id)
+      let find = await this.db.findOne({
+        _id: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: this.id
+        }
+      })
       if (!find.isSuccess) {
         alert(find.result)
         return
       }
 
-      this.customer = find.result
+      this.customer = find.result[0]
     }
   }
 }

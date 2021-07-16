@@ -17,7 +17,7 @@
                 <CInput
                   label="지점명"
                   placeholder="지점명을 입력해 주세요. [like]"
-                  v-model="table.search.name"
+                  v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -25,7 +25,7 @@
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [like]"
-                  v-model="table.search.contact"
+                  v-model="search.contact.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -35,7 +35,7 @@
                 <CInput
                   label="매니저"
                   placeholder="매니저를 입력해 주세요. [like]"
-                  v-model="table.search.owner"
+                  v-model="search.owner.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -43,7 +43,7 @@
                 <CInput
                   label="메모"
                   placeholder="메모를 입력해 주세요. [like]"
-                  v-model="table.search.description"
+                  v-model="search.description.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -59,9 +59,9 @@
 
     <CCard>
       <CDataTable
-        :items="table.rows"
-        :fields="table.fields"
-        :items-per-page="table.perPage"
+        :items="list.rows"
+        :fields="list.fields"
+        :items-per-page="list.perPage"
         hover
       >
         <template #owner="{item}">
@@ -87,8 +87,8 @@
       </CDataTable>
       
       <CPagination
-        :activePage.sync="table.currentPage"
-        :pages="table.totalPages"
+        :activePage.sync="list.currentPage"
+        :pages="list.totalPages"
         align="center"
       />
     </CCard>
@@ -103,7 +103,25 @@ export default {
       bind: {
         isCollapsed: true
       },
-      table: {
+      search: {
+        name: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        contact: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        owner: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        description: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        }
+      },
+      list: {
         rows: [],
         fields: [
           { key: 'name', label: '지점명' },
@@ -114,32 +132,22 @@ export default {
         ],
         currentPage: 1,
         perPage: 15,
-        totalPages: 0,
-        search: {
-          name: '',
-          contact: '',
-          owner: '',
-          description: '',
-          getQuery () {
-            return {
-              name: !this.name ? '' : { $regex: new RegExp(this.name) },
-              contact: !this.contact ? '' : { $regex: new RegExp(this.contact) },
-              owner: !this.owner ? '' : { $regex: new RegExp(this.owner) },
-              description: !this.description ? '' : { $regex: new RegExp(this.description) }
-            }
-          }
-        }
+        totalPages: 0
       }
     }
   },
   watch: {
-    'table.currentPage': async function () {
-      await this.find()
+    'list.currentPage': function () {
+      this.find()
     }
   },
   methods: {
     async find () {
-      await this.$db.stores2.findForTable(this.table)
+      let db = this.$db.stores
+      await db.find(
+        this.search
+        , { name: 1 }
+        , this.list)
     },
     goWrite () {
       this.$router.push({ path: '/stores/write' })
@@ -148,8 +156,8 @@ export default {
       this.$router.push({ path: `/stores/${id}` })
     }
   },
-  async mounted () {
-    await this.find()
+  mounted () {
+    this.find()
   }
 }
 </script>

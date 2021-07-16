@@ -33,7 +33,7 @@
                   autocomplete="new-password"
                   ref="pwdConfirm"
                   class="mb-4"
-                  v-model="pwdConfirm"
+                  v-model="account.pwdConfirm"
                   @keyup.enter="join"
                 >
                   <template #prepend-content><CIcon name="cil-lock-locked"/></template>
@@ -53,58 +53,29 @@ export default {
   name: 'register',
   data () {
     return {
-      db: this.$db.accounts2,
-      account: this.$db.accounts2.getDocument({ id: 'admin', name: '김수형', role: 99 }),
-      pwdConfirm: ''
+      account: this.$db.accounts.getNewDocument({ id: 'admin', name: '김수형', role: 99 })
     }
   },
   methods: {
     async join () {
-      if (!this.valid()) {
+      let db = this.$db.accounts
+      if (!db.validJoin(this, this.account)) {
         return
       }
 
-      this.account.pwd = this.$utils.crypt.encryptSHA512(this.account.pwd)
-      let add = await this.db.add(this.account)
-
-      if (!add.isSuccess) {
-        console.log(add.result)
+      let insert = await db.insert(this.account) // insert
+      if (!insert.isSuccess) {
+        console.log(insert.result)
         alert('계정 생성에 실패하였습니다.')
         return
       }
 
       this.$router.push({ path: '/login' })
-    },
-    valid () {
-      if (!this.account.id) {
-        alert(`[아이디]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'id').focus()
-        return false
-      }
-
-      if (!this.account.pwd) {
-        alert(`[비밀번호]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'pwd').focus()
-        return false
-      }
-
-      if (!this.pwdConfirm) {
-        alert(`[비밀번호 확인]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'pwdConfirm').focus()
-        return false
-      }
-
-      if (this.account.pwd !== this.pwdConfirm) {
-        alert(`비밀번호가 일치하지 않습니다`)
-        return false
-      }
-
-      return true
     }
   },
   async mounted () {
-    let count = await this.db.count({})
-    if (count.result > 0) {
+    let totalCnt = await this.$db.accounts.count()
+    if (totalCnt > 0) {
       this.$router.push({ path: '/login' })
     }
 

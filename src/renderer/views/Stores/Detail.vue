@@ -66,7 +66,7 @@ export default {
   data () {
     return {
       id: this.$route.params.id,
-      store: {}
+      store: this.$db.stores.getNewDocument()
     }
   },
   methods: {
@@ -81,7 +81,7 @@ export default {
     },
     async remove () {
       if (confirm('삭제하시겠습니까?')) {
-        let remove = await this.$db.stores2.remove(this.id)
+        let remove = await this.$db.stores.remove(this.id)
         if (!remove.isSuccess) {
           alert('고객정보를 삭제하지 못했습니다.')
           return
@@ -94,13 +94,18 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.stores2.findOne(this.id)
+    let find = await this.$db.stores.findOne({
+      _id: {
+        operator: this.$utils.enums.NedbQueryOperators.Equal,
+        value: this.id
+      }
+    })
     if (!find.isSuccess) {
       alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()
     }
 
-    this.store = find.result
+    this.store = find.result[0]
   }
 }
 </script>

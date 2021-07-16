@@ -81,7 +81,7 @@
           placeholder="비밀번호를 입력해주세요."
           ref="pwd"
           type="password"
-          v-model="modal.pwd"
+          v-model="modal.pwd.value"
           @keydown.enter="modalCompleted"
         />
       </CCol>
@@ -102,7 +102,7 @@ export default {
   data () {
     return {
       id: this.$route.params.id,
-      customer: {},
+      customer: this.$db.customers.getNewDocument(),
       actionCodes: {
         CONTACT_READ: 1,
         DOCUMENT_UPDATE: 2
@@ -111,7 +111,10 @@ export default {
         show: false,
         confirmPwd: false,
         actionCode: 0,
-        pwd: ''
+        pwd: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        }
       }
     }
   },
@@ -130,9 +133,6 @@ export default {
     goOrderWrite () {
       this.$router.push({ path: `/orders/write?customerId=${this.id}&name=${this.customer.name}` })
     },
-    goCustomerWrite () {
-      this.$router.push({ path: `/customers/Write/${this.id}` })
-    },
     authCheck (actionCode) {
       this.modal.actionCode = actionCode
       if (!this.modal.confirmPwd) {
@@ -141,7 +141,7 @@ export default {
       }
 
       if (this.modal.actionCode === this.actionCodes.DOCUMENT_UPDATE) {
-        this.goCustomerWrite()
+        this.$router.push({ path: `/customers/Write/${this.id}` })
       }
     },
     async modalCompleted () {
@@ -161,12 +161,12 @@ export default {
       this.modal.show = false
 
       if (this.modal.actionCode === this.actionCodes.DOCUMENT_UPDATE) {
-        this.goCustomerWrite()
+        this.$router.push({ path: `/customers/Write/${this.id}` })
       }
     },
     async remove () {
       if (confirm('삭제하시겠습니까?')) {
-        let remove = await this.$db.customers2.remove(this.id)
+        let remove = await this.$db.customers.remove(this.id)
         if (!remove.isSuccess) {
           alert('고객 정보를 삭제하지 못했습니다.')
           return
@@ -179,13 +179,18 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.customers2.findOne(this.id)
+    let find = await this.$db.customers.findOne({
+      _id: {
+        operator: this.$utils.enums.NedbQueryOperators.Equal,
+        value: this.id
+      }
+    })
     if (!find.isSuccess) {
-      alert(find.result)
+      alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()
     }
 
-    this.customer = find.result
+    this.customer = find.result[0]
   }
 }
 </script>

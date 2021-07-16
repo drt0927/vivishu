@@ -17,7 +17,7 @@
                 <CInput
                   label="이름"
                   placeholder="이름을 입력해 주세요. [like]"
-                  v-model="table.search.name"
+                  v-model="search.name.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -25,7 +25,7 @@
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="table.search.contact"
+                  v-model="search.contact.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -34,7 +34,7 @@
               <CCol sm="6">
                 <CSelect
                   label="행사 알림"
-                  :value.sync="table.search.isEventAlarm"
+                  :value.sync="search.isEventAlarm.value"
                   :options="bind.isEventAlarmOptions"
                   @keyup.enter="find"
                 />
@@ -43,7 +43,7 @@
                 <CInput
                   label="메모"
                   placeholder="메모를 입력해 주세요. [like]"
-                  v-model="table.search.description"
+                  v-model="search.description.value"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -58,9 +58,9 @@
     </transition>
     <CCard>
       <CDataTable
-        :items="table.rows"
-        :fields="table.fields"
-        :items-per-page="table.perPage"
+        :items="list.rows"
+        :fields="list.fields"
+        :items-per-page="list.perPage"
         hover
       >
         <template #contact="{item}">
@@ -91,8 +91,8 @@
       </CDataTable>
       
       <CPagination
-        :activePage.sync="table.currentPage"
-        :pages="table.totalPages"
+        :activePage.sync="list.currentPage"
+        :pages="list.totalPages"
         align="center"
       />
     </CCard>
@@ -105,7 +105,33 @@ export default {
   data () {
     return {
       date: new Date(),
-      table: {
+      bind: {
+        isEventAlarmOptions: [
+          { value: '', label: '전체' },
+          { value: true, label: '알림' },
+          { value: false, label: '미알림' }
+        ],
+        isCollapsed: true
+      },
+      search: {
+        name: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        },
+        contact: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        },
+        isEventAlarm: {
+          operator: this.$utils.enums.NedbQueryOperators.Equal,
+          value: ''
+        },
+        description: {
+          operator: this.$utils.enums.NedbQueryOperators.Regex,
+          value: ''
+        }
+      },
+      list: {
         rows: [],
         fields: [
           { key: 'name', label: '이름' },
@@ -115,40 +141,22 @@ export default {
         ],
         currentPage: 1,
         perPage: 15,
-        totalPages: 0,
-        search: {
-          name: '',
-          contact: '',
-          isEventAlarm: '',
-          description: '',
-          getQuery () {
-            return {
-              name: !this.name ? '' : { $regex: new RegExp(this.name) },
-              contact: this.contact,
-              isEventAlarm: this.isEventAlarm,
-              description: !this.description ? '' : { $regex: new RegExp(this.description) }
-            }
-          }
-        }
-      },
-      bind: {
-        isEventAlarmOptions: [
-          { value: '', label: '전체' },
-          { value: true, label: '알림' },
-          { value: false, label: '미알림' }
-        ],
-        isCollapsed: true
+        totalPages: 0
       }
     }
   },
   watch: {
-    'table.currentPage': async function () {
+    'list.currentPage': async function () {
       await this.find()
     }
   },
   methods: {
     async find () {
-      await this.$db.customers2.findForTable(this.table)
+      let db = this.$db.customers
+      await db.find(
+        this.search
+        , { name: 1 }
+        , this.list)
     },
     goWrite () {
       this.$router.push({ path: '/customers/write' })
