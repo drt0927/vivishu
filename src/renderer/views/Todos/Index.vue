@@ -90,7 +90,7 @@ export default {
       this.search.isCompleted === false) {
         query.isCompleted = this.search.isCompleted
       }
-      let find = await this.db.findByQuery(query)
+      let find = await this.db.find(query, { createDate: -1 }, 0, 9999)
       if (!find.isSuccess) {
         console.log(find.result)
         alert('Todo 정보 조회를 실패하였습니다.')
