@@ -1,283 +1,258 @@
 'use strict'
 
+import Datastore from 'nedb'
+import path from 'path'
+import { remote } from 'electron'
 import utils from '../utils/utils'
-import enums from '../utils/enums'
 import cloneDeep from 'lodash.clonedeep'
+// import enums from '../utils/enums'
+
+const dbFactory = file => {
+  return new Datastore({
+    filename: `${path.join(remote.app.getPath('userData'))}/data/${file}`,
+    autoload: true
+  })
+}
 
 export default class NedbHelper {
-  constructor (db, encryptFields, ignoreFields) {
-    this.db = db
-    this.encryptFields = encryptFields || []
-    this.ignoreFields = ignoreFields || []
+  constructor (dbName, cryptFields) {
+    this.db = dbFactory(dbName)
+    this.cryptFields = cryptFields || []
   }
 
-  getDocument (doc) {
-    let newDoc = this.deepClone(Object.assign({}, this.doc, doc))
-
-    // 암호화 필드
-    this.encryptFields.forEach(field => {
-      if (field.type === enums.EncryptType.AES && doc[field.key] !== undefined) {
-        newDoc[field.key] = utils.crypt.encryptAES256(newDoc[field.key])
-      } else if (field.type === enums.EncryptType.SHA && doc[field.key] !== undefined) {
-        newDoc[field.key] = utils.crypt.encryptSHA512(newDoc[field.key])
-      }
-    })
-    if (!newDoc.createDate) {
-      newDoc.createDate = new Date()
+  /**
+   * 결과 Model 반환
+   * @param {Object} err 에러값
+   * @param {Object} data 결과데이터
+   * @returns result Model
+   */
+  getResult (err, data) {
+    if (err) {
+      console.error(err)
     }
-
-    // 저장하면 안되는 필드 제거
-    this.ignoreFields.forEach(field => {
-      if (newDoc[field] !== undefined) {
-        delete newDoc[field]
-      }
-    })
-
-    return newDoc
-  }
-
-  getDocuments (docs) {
-    let newDocs = []
-    for (var doc of docs) {
-      newDocs.push(this.getDocument(doc))
+    return {
+      isSuccess: !err,
+      result: data
     }
-
-    return newDocs
   }
 
-  // 깊은 복사
-  deepClone (obj) {
-    if (!obj) {
-      return {}
+  /**
+   * 암호화 필드 crypt 처리
+   * @param {Object} doc doc
+   */
+  convertEncrypt (doc) {
+    for (let f of this.cryptFields) {
+      doc[f] = utils.crypt.encryptAES256(doc[f])
     }
-
-    return cloneDeep(obj)
   }
 
-  query (search) {
-    let query = {}
-
-    // 암호화 필드
-    this.encryptFields.forEach(field => {
-      if (field.type === enums.EncryptType.AES && search[field.key] && search[field.key].value) {
-        search[field.key].value = utils.crypt.encryptAES256(search[field.key].value)
-      } else if (field.type === enums.EncryptType.SHA && search[field.key] && search[field.key].value) {
-        search[field.key].value = utils.crypt.encryptSHA512(search[field.key].value)
-      }
-    })
-
-    for (let fieldKey in search) {
-      if (search[fieldKey].value === '' || search[fieldKey].value === undefined || search[fieldKey].value === null) {
-        continue
-      }
-
-      if (search[fieldKey].operator === enums.NedbQueryOperators.Regex) {
-        if (!query[fieldKey]) {
-          query[fieldKey] = {}
-        }
-
-        query[fieldKey].$regex = new RegExp(search[fieldKey].value)
-      } else if (search[fieldKey].operator === enums.NedbQueryOperators.Equal) {
-        query[fieldKey] = search[fieldKey].value
-      } else if (search[fieldKey].operator === enums.NedbQueryOperators.Where) {
-        search[fieldKey].callback(search[fieldKey].value)
-        query.$where = search[fieldKey].func
-      } else if (search[fieldKey].operator === enums.NedbQueryOperators.GraterThanEqual) {
-        if (!query[fieldKey]) {
-          query[fieldKey] = {}
-        }
-        query[fieldKey].$gte = search[fieldKey].value
-      } else if (search[fieldKey].operator === enums.NedbQueryOperators.LessThanEqual) {
-        if (!query[fieldKey]) {
-          query[fieldKey] = {}
-        }
-        query[fieldKey].$lte = search[fieldKey].value
-      }
+  /**
+   * 복호화 필드 crypt 처리
+   * @param {Object} doc doc
+   */
+  convertDecrypt (doc) {
+    for (let f of this.cryptFields) {
+      doc[f] = utils.crypt.decryptAES256(doc[f])
     }
-
-    return query
   }
 
-  async insertRange (docs) {
-    return new Promise(async (resolve) => {
-      let newDocs = this.getDocuments(docs)
-      if (newDocs.length < 1) {
-        return
+  /**
+   * 단일 doc 추가
+   * @param {Object} doc Add Object
+   * @returns result Model
+   */
+  async add (doc) {
+    return new Promise(resolve => {
+      let cryptDoc = cloneDeep(doc)
+      if (!cryptDoc.createDate) {
+        cryptDoc.createDate = new Date()
       }
-
-      for (let doc of newDocs) {
-        let result = await this.insert(doc)
-        if (!result.isSuccess) {
-          resolve({
-            isSuccess: false,
-            result: result.err
-          })
-          break
-        }
-      }
-
-      resolve({
-        isSuccess: true
+      this.convertEncrypt(cryptDoc)
+      this.db.insert(cryptDoc, (err, newDoc) => {
+        resolve(this.getResult(err, newDoc))
       })
     })
   }
 
-  async insert (doc) {
-    return new Promise((resolve) => {
-      let newDoc = this.getDocument(doc)
-      if (newDoc === undefined) {
-        return
+  /**
+   * 다중 doc 추가
+   * @param {Array} docs Add Objects
+   * @returns result Model
+   */
+  async addRange (docs) {
+    return new Promise(resolve => {
+      let insertDocs = []
+
+      for (let doc in docs) {
+        let insertDoc = cloneDeep(doc)
+        if (!insertDoc.createDate) {
+          insertDoc.createDate = new Date()
+        }
+        insertDocs.push(insertDoc)
       }
 
-      this.db.insert(newDoc, (err, newDoc) => {
-        if (err) {
-          resolve({
-            isSuccess: false,
-            result: err
-          })
-        }
-
-        resolve({
-          isSuccess: true,
-          result: newDoc
-        })
+      this.db.insert(docs, (err, newDocs) => {
+        resolve(this.getResult(err, newDocs))
       })
     })
   }
 
+  /**
+   * 단일 doc 삭제
+   * @param {String} id doc _id
+   * @returns result Model
+   */
   async remove (id) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.db.remove({ _id: id }, {}, (err, numRemoved) => {
-        if (err) {
-          resolve({
-            isSuccess: false,
-            result: err
-          })
-        }
-
-        resolve({
-          isSuccess: true,
-          result: numRemoved
-        })
+        resolve(this.getResult(err, numRemoved))
       })
     })
   }
 
-  async update (id, doc) {
-    return new Promise((resolve) => {
-      let newDoc = this.getDocument(doc)
-      if (newDoc === undefined) {
-        return
+  /**
+   * 다중 doc 삭제
+   * @param {Object} query 삭제 대상 쿼리
+   * @returns result Model
+   */
+  async removeMulti (query) {
+    return new Promise(resolve => {
+      if (!query) {
+        resolve(this.getResult('삭제 쿼리가 비어있습니다.', 0))
       }
-
-      this.db.update({ _id: id }, { $set: newDoc }, {}, (err, numUpdated) => {
-        if (err) {
-          resolve({
-            isSuccess: false,
-            result: err
-          })
-        }
-
-        resolve({
-          isSuccess: true,
-          result: numUpdated
-        })
+      this.db.remove(query, { multi: true }, (err, numRemoved) => {
+        resolve(this.getResult(err, numRemoved))
       })
     })
   }
 
-  async findOne (search) {
-    return new Promise((resolve) => {
-      let helper = this
-      let deepSearch = this.deepClone(search)
-      let query = this.query(deepSearch)
-      this.db.find(query)
-        .limit(1)
-        .exec((err, docs) => {
-          if (err) {
-            resolve({
-              isSuccess: false,
-              result: '조회 실패!'
-            })
-          }
-
-          if (docs.length < 1) {
-            resolve({
-              isSuccess: false,
-              result: '조회 실패!'
-            })
-          }
-
-          docs.forEach(value => {
-            helper.encryptFields.forEach(field => {
-              if (field.type === enums.EncryptType.AES && value[field.key] !== undefined) {
-                value[field.key] = utils.crypt.decryptAES256(value[field.key])
-              }
-            })
-          })
-
-          resolve({
-            isSuccess: true,
-            result: docs
-          })
-        })
+  /**
+   * 단일 doc 업데이트
+   * @param {Object} doc 업데이트 대상 doc
+   * @returns result Model
+   */
+  async update (doc) {
+    return new Promise(resolve => {
+      if (!doc._id) {
+        resolve(this.getResult('_id가 없습니다.', 0))
+      }
+      let cryptDoc = cloneDeep(doc)
+      if (!cryptDoc.createDate) {
+        cryptDoc.createDate = new Date()
+      }
+      this.convertEncrypt(cryptDoc)
+      this.db.update({ _id: cryptDoc._id }, cryptDoc, {}, (err, numAffected) => {
+        resolve(this.getResult(err, numAffected))
+      })
     })
   }
 
-  async find (search, sort, list) {
-    return new Promise(async (resolve) => {
-      let helper = this
-
-      let deepSearch = this.deepClone(search)
-      let query = this.query(deepSearch)
-      let totalCnt = await this.count(deepSearch)
-      list.totalPages = Math.ceil(totalCnt / list.perPage)
-
-      this.db.find(query)
-        .sort(sort)
-        .skip((list.currentPage - 1) * list.perPage)
-        .limit(list.perPage)
-        .exec((err, docs) => {
-          if (err) {
-            resolve({
-              isSuccess: false,
-              result: '조회 실패!'
-            })
-          }
-
-          if (!docs) {
-            docs = []
-          }
-
-          docs.forEach(value => {
-            helper.encryptFields.forEach(field => {
-              if (field.type === enums.EncryptType.AES && value[field.key] !== undefined) {
-                value[field.key] = utils.crypt.decryptAES256(value[field.key])
-              }
-            })
-          })
-
-          list.rows = docs
-
-          resolve({
-            isSuccess: true,
-            result: docs
-          })
-        })
+  /**
+   * 다중 doc 업데이트
+   * @param {Object} query 업데이트 대상 쿼리
+   * @param {Object} doc 업데이트 대상 doc
+   * @returns result Model
+   */
+  async updateMulti (query, doc) {
+    return new Promise(resolve => {
+      if (!query) {
+        resolve(this.getResult('업데이트 쿼리가 비어있습니다.', 0))
+      }
+      this.db.update(query, doc, { multi: true }, (err, numAffected, affectedDocuments) => {
+        resolve(this.getResult(err, { numAffected: numAffected, affectedDocuments: affectedDocuments }))
+      })
     })
   }
 
-  async count (search) {
-    return new Promise((resolve) => {
-      let deepSearch = this.deepClone(search)
-      let query = this.query(deepSearch)
-
-      this.db.count(query, (err, cnt) => {
-        if (err) {
-          resolve(0)
+  /**
+   * 단일 doc 검색
+   * @param {String} id 검색 대상 _id
+   * @returns result Model
+   */
+  async findOne (id) {
+    return new Promise(resolve => {
+      this.db.findOne({ _id: id }, (err, doc) => {
+        if (doc) {
+          // 복호화
+          this.convertDecrypt(doc)
         }
 
-        resolve(cnt)
+        resolve(this.getResult(err, doc))
+      })
+    })
+  }
+
+  /**
+   * 단일 doc 쿼리 검색
+   * @param {Object}} query 검색 쿼리
+   * @returns result Model
+   */
+  async findOneByQuery (query) {
+    return new Promise(resolve => {
+      this.db.findOne(query, (err, doc) => {
+        resolve(this.getResult(err, doc))
+      })
+    })
+  }
+
+  /**
+   * 다중 doc 검색
+   * @param {Object} query 검색 쿼리
+   * @param {Object} sort 정렬
+   * @param {Number} skip 건너뛰기
+   * @param {Number} limit doc 개수
+   * @returns result Model
+   */
+  async find (query, sort, skip, limit) {
+    return new Promise(resolve => {
+      this.db
+        .find(query)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .exec((err, docs) => {
+          resolve(this.getResult(err, docs))
+        })
+    })
+  }
+
+  /**
+   * 테이블 바인딩을 위한 검색
+   * @param {Object} table 테이블 조회 Object
+   */
+  async findForTable (table) {
+    let query = table.search.getQuery()
+    for (var q in query) {
+      if (!query[q]) {
+        delete query[q]
+      }
+    }
+    let count = await this.count(query)
+    let skip = (table.currentPage - 1) * table.perPage
+    let find = await this.find(query, table.sort, skip, table.perPage)
+
+    table.totalPages = Math.ceil(count.result / table.perPage)
+
+    // 복호화
+    find.result.forEach(value => {
+      this.convertDecrypt(value)
+    })
+
+    table.rows = find.result
+  }
+
+  /**
+   * doc의 개수 조회
+   * @param {Object} query 개수 조회 쿼리
+   * @returns result Model
+   */
+  async count (query) {
+    return new Promise(resolve => {
+      if (!query) {
+        resolve(this.getResult('개수 조회 쿼리가 비어있습니다.', 0))
+      }
+      this.db.count(query, (err, count) => {
+        resolve(this.getResult(err, count))
       })
     })
   }

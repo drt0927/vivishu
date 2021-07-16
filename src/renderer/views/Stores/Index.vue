@@ -139,7 +139,7 @@ export default {
   },
   methods: {
     async find () {
-      await this.$db.stores2.findForTable(this.table)
+      await this.$db.stores.findForTable(this.table)
     },
     goWrite () {
       this.$router.push({ path: '/stores/write' })

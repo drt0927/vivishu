@@ -74,8 +74,8 @@ export default {
   data () {
     return {
       id: this.$route.params.id,
-      db: this.$db.customers2,
-      customer: this.$db.customers2.getDocument(),
+      db: this.$db.customers,
+      customer: this.$db.customers.getDocument(),
       modal: {
         show: false
       }

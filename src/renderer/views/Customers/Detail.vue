@@ -151,7 +151,7 @@ export default {
         return false
       }
 
-      let find = await this.$db.accounts2.findOneByQuery({ id: this.accountId, pwd: this.$utils.crypt.encryptSHA512(this.modal.pwd) })
+      let find = await this.$db.accounts.findOneByQuery({ id: this.accountId, pwd: this.$utils.crypt.encryptSHA512(this.modal.pwd) })
       if (!find.isSuccess) {
         alert(find.result)
         return
@@ -166,7 +166,7 @@ export default {
     },
     async remove () {
       if (confirm('삭제하시겠습니까?')) {
-        let remove = await this.$db.customers2.remove(this.id)
+        let remove = await this.$db.customers.remove(this.id)
         if (!remove.isSuccess) {
           alert('고객 정보를 삭제하지 못했습니다.')
           return
@@ -179,7 +179,7 @@ export default {
     }
   },
   async mounted () {
-    let find = await this.$db.customers2.findOne(this.id)
+    let find = await this.$db.customers.findOne(this.id)
     if (!find.isSuccess) {
       alert(find.result)
       this.goIndex()

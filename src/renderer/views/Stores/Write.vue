@@ -61,8 +61,8 @@ export default {
   data () {
     return {
       id: this.$route.params.id,
-      db: this.$db.stores2,
-      store: this.$db.stores2.getDocument()
+      db: this.$db.stores,
+      store: this.$db.stores.getDocument()
     }
   },
   methods: {

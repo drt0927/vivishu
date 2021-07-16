@@ -50,8 +50,8 @@ export default {
   name: 'login',
   data () {
     return {
-      db: this.$db.accounts2,
-      account: this.$db.accounts2.getDocument({ id: 'admin' })
+      db: this.$db.accounts,
+      account: this.$db.accounts.getDocument({ id: 'admin' })
     }
   },
   computed: {

@@ -41,7 +41,7 @@ export default {
     ])
   },
   async mounted () {
-    let count = await this.$db.accounts2.count({})
+    let count = await this.$db.accounts.count({})
     if (count.result < 1) {
       this.$router.push({ path: '/register' })
     }

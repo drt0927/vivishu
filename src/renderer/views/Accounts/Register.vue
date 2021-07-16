@@ -53,8 +53,8 @@ export default {
   name: 'register',
   data () {
     return {
-      db: this.$db.accounts2,
-      account: this.$db.accounts2.getDocument({ id: 'admin', name: '김수형', role: 99 }),
+      db: this.$db.accounts,
+      account: this.$db.accounts.getDocument({ id: 'admin', name: '김수형', role: 99 }),
       pwdConfirm: ''
     }
   },

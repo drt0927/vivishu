@@ -175,7 +175,7 @@ export default {
   },
   methods: {
     async find () {
-      await this.$db.orders2.findForTable(this.table)
+      await this.$db.orders.findForTable(this.table)
     },
     getTypeConvert (type) {
       if (type === 1) {
