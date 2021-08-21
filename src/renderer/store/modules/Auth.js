@@ -21,6 +21,12 @@ const getters = {
     if (today.getUTCFullYear() !== loginDate.getUTCFullYear() ||
     today.getUTCMonth() !== loginDate.getUTCMonth() ||
     today.getUTCDate() !== loginDate.getUTCDate()) {
+      state.isLogin = false
+      state.loginDateTime = null
+      state.user = {
+        id: String,
+        name: String
+      }
       return false
     }
 

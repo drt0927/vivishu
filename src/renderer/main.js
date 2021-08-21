@@ -5,7 +5,6 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-// import db from './datastore'
 import db from './datastore/index'
 import FilbertUtils from './plugin/utils'
 
@@ -15,10 +14,6 @@ import VueSweetalert2 from 'vue-sweetalert2'
 import VueDaumPostcode from 'vue-daum-postcode'
 import VCalendar from 'v-calendar'
 import moment from 'moment'
-// import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-
-// import 'bootstrap/dist/css/bootstrap.css'
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
@@ -37,6 +32,7 @@ Vue.use(VCalendar)
 // Vue.use(BootstrapVue)
 // Vue.use(IconsPlugin)
 /* eslint-disable no-new */
+console.log(store)
 
 new Vue({
   components: { App },

@@ -112,7 +112,6 @@ export default {
 
     // 전월대비(비용, 일자별) line chart
     let compare = await this.$db.sales.getCompareSales()
-    console.log(compare)
     this.amountCompareChart.labels = compare.labels
     this.amountCompareChart.datasets[0].data = compare.data.current
     this.amountCompareChart.datasets[1].data = compare.data.last
