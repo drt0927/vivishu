@@ -9,7 +9,7 @@
       <CHeaderNavLink>
         <div class="c-avatar">
           <img
-            src="~@/assets/vivishu.png"
+            src="~@/assets/vivishu2.png"
             class="c-avatar-img"
           />
         </div>
@@ -18,11 +18,14 @@
     <CDropdownHeader tag="div" class="text-center" color="light">
       <strong>Account</strong>
     </CDropdownHeader>
-    <CDropdownItem>
-      <CIcon name="cil-bell"/> Updates
-      <CBadge color="info" class="mfs-auto">{{ itemsCount }}</CBadge>
+    <CDropdownItem @click="goRegister" v-show="id === 'admin'">
+      <CIcon name="cil-user"/> 직원 계정 생성
+      <!-- <CBadge color="info" class="mfs-auto">{{ itemsCount }}</CBadge> -->
     </CDropdownItem>
-    <CDropdownItem>
+    <CDropdownItem @click="userLogout">
+      <CIcon name="cil-lock-locked" /> Logout
+    </CDropdownItem>
+    <!-- <CDropdownItem>
       <CIcon name="cil-envelope-open" /> Messages
       <CBadge color="success" class="mfs-auto">{{ itemsCount }}</CBadge>
     </CDropdownItem>
@@ -58,15 +61,12 @@
     <CDropdownDivider/>
     <CDropdownItem>
       <CIcon name="cil-shield-alt" /> Lock Account
-    </CDropdownItem>
-    <CDropdownItem @click="userLogout">
-      <CIcon name="cil-lock-locked" /> Logout
-    </CDropdownItem>
+    </CDropdownItem> -->
   </CDropdown>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'HeaderDropdownAccnt',
@@ -75,6 +75,12 @@ export default {
       itemsCount: 42
     }
   },
+  computed: {
+    ...mapGetters({
+      isLogin: 'Auth/isLogin',
+      id: 'Auth/id'
+    })
+  },
   methods: {
     ...mapActions('Auth', [
       'logout'
@@ -82,6 +88,9 @@ export default {
     userLogout () {
       this.logout()
       this.$router.push('login')
+    },
+    goRegister () {
+      this.$router.push({ path: '/register' })
     }
   }
 }
@@ -91,4 +100,8 @@ export default {
 .c-icon {
     margin-right: 0.3rem;
   }
+.c-avatar {
+  width: 50px;
+  height: 50px;
+}
 </style>

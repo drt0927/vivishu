@@ -231,13 +231,17 @@ export default class NedbHelper {
    * 테이블 바인딩을 위한 검색
    * @param {Object} table 테이블 조회 Object
    */
-  async findForTable (table) {
-    let query = table.search.getQuery()
-    for (var q in query) {
-      if (!query[q]) {
-        delete query[q]
+  async findForTable (table, codes = []) {
+    let query = {}
+    if (table.search && table.search.getQuery) {
+      query = table.search.getQuery()
+      for (var q in query) {
+        if (!query[q]) {
+          delete query[q]
+        }
       }
     }
+
     let count = await this.count(query)
     let skip = (table.currentPage - 1) * table.perPage
     let find = await this.find(query, table.sort, skip, table.perPage)
@@ -249,6 +253,14 @@ export default class NedbHelper {
       this.convertDecrypt(value)
     })
 
+    if (codes.length > 0) {
+      find.result.forEach((r) => {
+        let code = codes.find((e) => Number(e.code) === Number(r.type))
+        r.typeName = code.name
+        r.typeColor = code.color
+      })
+    }
+
     table.rows = find.result
   }
 
@@ -259,9 +271,9 @@ export default class NedbHelper {
    */
   async count (query) {
     return new Promise(resolve => {
-      if (!query) {
-        resolve(this.getResult('개수 조회 쿼리가 비어있습니다.', 0))
-      }
+      // if (!query) {
+      //   resolve(this.getResult('개수 조회 쿼리가 비어있습니다.', 0))
+      // }
       this.db.count(query, (err, count) => {
         resolve(this.getResult(err, count))
       })

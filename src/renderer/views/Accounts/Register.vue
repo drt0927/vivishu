@@ -13,7 +13,7 @@
                   autocomplete="username"
                   v-model="account.id"
                   @keyup.enter="join"
-                  disabled
+                  :disabled="id !== 'admin'"
                 >
                   <template #prepend-content><CIcon name="cil-user"/></template>
                 </CInput>
@@ -28,7 +28,7 @@
                   <template #prepend-content><CIcon name="cil-lock-locked"/></template>
                 </CInput>
                 <CInput
-                  placeholder="Repeat password"
+                  placeholder="Confirm Password"
                   type="password"
                   autocomplete="new-password"
                   ref="pwdConfirm"
@@ -39,6 +39,7 @@
                   <template #prepend-content><CIcon name="cil-lock-locked"/></template>
                 </CInput>
                 <CButton color="success" block @click="join">계정 생성</CButton>
+                <CButton color="danger" block @click="cancel">취소</CButton>
               </CForm>
             </CCardBody>
           </CCard>
@@ -49,6 +50,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'register',
   data () {
@@ -58,9 +61,16 @@ export default {
       pwdConfirm: ''
     }
   },
+  computed: {
+    ...mapGetters({
+      id: 'Auth/id',
+      isLogin: 'Auth/isLogin'
+    })
+  },
   methods: {
     async join () {
-      if (!this.valid()) {
+      let isValid = await this.valid()
+      if (!isValid) {
         return
       }
 
@@ -75,7 +85,10 @@ export default {
 
       this.$router.push({ path: '/login' })
     },
-    valid () {
+    cancel () {
+      this.$router.push({ path: '/login' })
+    },
+    async valid () {
       if (!this.account.id) {
         alert(`[아이디]은(는) 필수 값 입니다.`)
         this.$utils.common.getElement(this, 'id').focus()
@@ -99,16 +112,29 @@ export default {
         return false
       }
 
+      let count = await this.db.count({ id: this.account.id })
+      if (count.isSuccess && count.result > 0) {
+        alert('동일 계정이 존재합니다.')
+        return false
+      } else if (!count.isSuccess) {
+        alert('계정 생성중 에러가 발생하였습니다.')
+        return false
+      }
+
       return true
     }
   },
   async mounted () {
-    let count = await this.db.count({})
-    if (count.result > 0) {
-      this.$router.push({ path: '/login' })
-    }
+    if (this.id !== 'admin') {
+      let count = await this.db.count({})
+      if (count.result > 0) {
+        this.$router.push({ path: '/login' })
+      }
 
-    this.$utils.common.getElement(this, 'pwd').focus()
+      this.$utils.common.getElement(this, 'pwd').focus()
+    } else {
+      this.account.id = ''
+    }
   }
 }
 </script>

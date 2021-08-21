@@ -97,7 +97,15 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
-"@coreui/coreui@^3.4.0":
+"@coreui/coreui-chartjs@2.0.0-beta.0":
+  version "2.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@coreui/coreui-chartjs/-/coreui-chartjs-2.0.0-beta.0.tgz#6233c301aa7e19c03698846da3a28ece037c8d86"
+  integrity sha512-Svua1A5YQNPbxcTMN/1TLiie/HJvT+iJ8VB3zPcy/c+ihJvFlIf7D0I5JcRL6LvQkZydq2xQiZ9/73Q+Z5BV6Q==
+  dependencies:
+    "@coreui/coreui" "^3.0.0-beta.1"
+    chart.js "^2.8.0"
+
+"@coreui/coreui@^3.0.0-beta.1", "@coreui/coreui@^3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@coreui/coreui/-/coreui-3.4.0.tgz#3e3627a1f48a00f6289204a23f71eaa6ea94e370"
   integrity sha512-WqzockdWVkXUNmNwlqdu+AxM+9JoiWGe4rKaySu/dZme1NvVOn2ukjJlpTkssal8UKcSHyitzNixtkMCmUxE1A==
@@ -118,6 +126,15 @@
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@coreui/utils/-/utils-1.3.1.tgz#ebe6fa00ae7f46d166b26f116e74d55dfc89f5e0"
   integrity sha512-WuWHX7bg89cJH34TWVsLe9RsxzBhTApj+X2Ja19xhjcpxt5Gv11Ozm+fwYt6DD7DgncTvpwYrMcnNlpp701UOg==
+
+"@coreui/vue-chartjs@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@coreui/vue-chartjs/-/vue-chartjs-1.0.6.tgz#47e007eef2d3f08e1c9c6e115580201df778e79b"
+  integrity sha512-x116yRGqBfxBxFFMhJXsY2MDbIBJWajSA24j2w4zyrShjshES2G6iBxi9zSbug0H+3ariYY+fyhv/0uFJ4G/Yg==
+  dependencies:
+    "@coreui/coreui-chartjs" "2.0.0-beta.0"
+    chart.js "^2.9.3"
+    vue "^2.6.12"
 
 "@coreui/vue@^3.2.11":
   version "3.2.11"
@@ -2272,6 +2289,29 @@ chardet@^0.4.0:
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.4.2.tgz#b5473b33dc97c424e5d98dc87d55d4d8a29c8bf2"
   integrity sha1-tUc7M9yXxCTl2Y3IfVXU2KKci/I=
 
+chart.js@^2.8.0, chart.js@^2.9.3:
+  version "2.9.4"
+  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-2.9.4.tgz#0827f9563faffb2dc5c06562f8eb10337d5b9684"
+  integrity sha512-B07aAzxcrikjAPyV+01j7BmOpxtQETxTSlQ26BEYJ+3iUkbNKaOJ/nDbT6JjyqYxseM0ON12COHYdU2cTIjC7A==
+  dependencies:
+    chartjs-color "^2.1.0"
+    moment "^2.10.2"
+
+chartjs-color-string@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/chartjs-color-string/-/chartjs-color-string-0.6.0.tgz#1df096621c0e70720a64f4135ea171d051402f71"
+  integrity sha512-TIB5OKn1hPJvO7JcteW4WY/63v6KwEdt6udfnDE9iCAZgy+V4SrbSxoIbTw/xkUIapjEI4ExGtD0+6D3KyFd7A==
+  dependencies:
+    color-name "^1.0.0"
+
+chartjs-color@^2.1.0:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/chartjs-color/-/chartjs-color-2.4.1.tgz#6118bba202fe1ea79dd7f7c0f9da93467296c3b0"
+  integrity sha512-haqOg1+Yebys/Ts/9bLo/BqUcONQOdr/hoEr2LLTRl6C5LXctUdHxsCYfvQVg5JIxITrfCNUDr4ntqmQk9+/0w==
+  dependencies:
+    chartjs-color-string "^0.6.0"
+    color-convert "^1.9.3"
+
 chokidar@^2.1.8:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.8.tgz#804b3a7b6a99358c3c5c61e71d8728f041cff917"
@@ -2338,6 +2378,11 @@ circular-json@^0.3.1:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.3.3.tgz#815c99ea84f6809529d2f45791bdf82711352d66"
   integrity sha512-UZK3NBx2Mca+b5LsG7bY183pHWt5Y1xts4P3Pz7ENTwGVnJOUWbRb3ocjvX7hx9tq/yTAdclXm9sZ38gNuem4A==
+
+clamp@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/clamp/-/clamp-1.0.1.tgz#66a0e64011816e37196828fdc8c8c147312c8634"
+  integrity sha1-ZqDmQBGBbjcZaCj9yMjBRzEshjQ=
 
 clap@^1.0.9:
   version "1.2.3"
@@ -2465,7 +2510,7 @@ collection-visit@^1.0.0:
     map-visit "^1.0.0"
     object-visit "^1.0.0"
 
-color-convert@^1.3.0, color-convert@^1.9.0:
+color-convert@^1.3.0, color-convert@^1.9.0, color-convert@^1.9.3:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.3.tgz#bb71850690e1f136567de629d2d5471deda4c1e8"
   integrity sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==
@@ -5852,6 +5897,11 @@ lodash.some@^4.6.0:
   resolved "https://registry.yarnpkg.com/lodash.some/-/lodash.some-4.6.0.tgz#1bb9f314ef6b8baded13b549169b2a945eb68e4d"
   integrity sha1-G7nzFO9ri63tE7VJFpsqlF62jk0=
 
+lodash.throttle@^4.0.0:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
+
 lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
@@ -5976,6 +6026,11 @@ map-visit@^1.0.0:
   integrity sha1-7Nyo8TFE5mDxtb1B8S80edmN+48=
   dependencies:
     object-visit "^1.0.0"
+
+material-colors@^1.0.0:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
+  integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
 math-expression-evaluator@^1.2.14:
   version "1.3.7"
@@ -6181,7 +6236,7 @@ mixin-deep@^1.2.0:
   dependencies:
     minimist "^1.2.5"
 
-moment@^2.29.1:
+moment@^2.10.2, moment@^2.29.1:
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
@@ -8764,6 +8819,11 @@ timers-browserify@^2.0.4:
   dependencies:
     setimmediate "^1.0.4"
 
+tinycolor2@^1.1.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.2.tgz#3f6a4d1071ad07676d7fa472e1fac40a719d8803"
+  integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
+
 title-case@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/title-case/-/title-case-2.1.1.tgz#3e127216da58d2bc5becf137ab91dae3a7cd8faa"
@@ -9216,6 +9276,16 @@ vm-browserify@^1.0.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
+
+vue-color@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/vue-color/-/vue-color-2.8.1.tgz#a090f3dcf8ed6f07afdb865cac84b19a73302e70"
+  integrity sha512-BoLCEHisXi2QgwlhZBg9UepvzZZmi4176vbr+31Shen5WWZwSLVgdScEPcB+yrAtuHAz42309C0A4+WiL9lNBw==
+  dependencies:
+    clamp "^1.0.1"
+    lodash.throttle "^4.0.0"
+    material-colors "^1.0.0"
+    tinycolor2 "^1.1.2"
 
 vue-daum-postcode@^0.10.0:
   version "0.10.0"

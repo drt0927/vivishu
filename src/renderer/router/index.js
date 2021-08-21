@@ -155,6 +155,75 @@ export default new Router({
               component: require('@/views/Trades/Detail').default
             }
           ]
+        },
+        {
+          path: '/sales',
+          redirect: '/sales',
+          name: '일매출',
+          component: require('@/views/Sales/Sales').default,
+          children: [
+            {
+              path: '/sales',
+              name: '일매출 목록',
+              component: require('@/views/Sales/Index').default
+            },
+            {
+              path: '/sales/write',
+              name: '일매출 추가',
+              component: require('@/views/Sales/Write').default
+            },
+            {
+              path: '/sales/write/:id',
+              name: '일매출 수정',
+              component: require('@/views/Sales/Write').default
+            },
+            {
+              path: '/sales/:id',
+              name: '일매출 상세',
+              component: require('@/views/Sales/Detail').default
+            }
+          ]
+        },
+        {
+          path: '/expense',
+          redirect: '/expense',
+          name: '지출',
+          component: require('@/views/Expense/Expense').default,
+          children: [
+            {
+              path: '/expense',
+              name: '지출 목록',
+              component: require('@/views/Expense/Index').default
+            },
+            {
+              path: '/expense/write',
+              name: '지출 추가',
+              component: require('@/views/expense/Write').default
+            },
+            {
+              path: '/expense/write/:id',
+              name: '지출 수정',
+              component: require('@/views/expense/Write').default
+            },
+            {
+              path: '/expense/:id',
+              name: '지출 상세',
+              component: require('@/views/expense/Detail').default
+            }
+          ]
+        },
+        {
+          path: '/codes',
+          redirect: '/codes',
+          name: '코드',
+          component: require('@/views/Codes/Codes').default,
+          children: [
+            {
+              path: '/codes',
+              name: '코드 목록',
+              component: require('@/views/Codes/Index').default
+            }
+          ]
         }
       ]
       // component: require('@/components/Layouts/Default').default

@@ -14,13 +14,23 @@ export default [
       },
       {
         _name: 'CSidebarNavTitle',
-        _children: ['자원관리']
+        _children: ['고객 관리']
       },
       {
         _name: 'CSidebarNavItem',
         name: '고객',
         to: '/customers',
         icon: 'cil-people'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: '주문장',
+        to: '/orders',
+        icon: 'cil-cart'
+      },
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['매장 관리']
       },
       {
         _name: 'CSidebarNavItem',
@@ -41,21 +51,37 @@ export default [
         icon: 'cil-list'
       },
       {
+        _name: 'CSidebarNavItem',
+        name: '일매출',
+        to: '/sales',
+        icon: 'cil-money',
+        type: 99
+      },
+      {
         _name: 'CSidebarNavTitle',
-        _children: ['거래관리']
+        _children: ['비용 관리'],
+        type: 99
       },
       {
         _name: 'CSidebarNavItem',
-        name: '주문장',
-        to: '/orders',
-        icon: 'cil-cart'
+        name: '지출',
+        to: '/expense',
+        icon: 'cil-wallet',
+        type: 99
       },
       {
         _name: 'CSidebarNavItem',
-        name: '수평이동',
-        to: '/trades',
-        icon: 'cil-loop-circular'
+        name: '코드',
+        to: '/codes',
+        icon: 'cil-code',
+        type: 99
       }
+      // {
+      //   _name: 'CSidebarNavItem',
+      //   name: '수평이동',
+      //   to: '/trades',
+      //   icon: 'cil-loop-circular'
+      // }
       // {
       //   _name: 'CSidebarNavDropdown',
       //   name: 'base',

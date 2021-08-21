@@ -4,6 +4,18 @@ import enums from './enums'
 const common = {
   getElement (vm, ref) {
     return vm.$refs[ref].$el.getElementsByTagName('input')[0]
+  },
+  Hex8toRgba (hex8) {
+    if (hex8.startsWith('#') && hex8.length !== 9) {
+      return ''
+    }
+
+    let r = parseInt(hex8.substring(1, 3), 16)
+    let g = parseInt(hex8.substring(3, 5), 16)
+    let b = parseInt(hex8.substring(5, 7), 16)
+    let a = parseInt(hex8.substring(7, 9), 16) / 255
+
+    return `rgba(${r},${g},${b},${a})`
   }
 }
 

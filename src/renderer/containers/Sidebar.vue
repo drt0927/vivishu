@@ -7,10 +7,10 @@
   >
     <CSidebarBrand class="d-md-down-none" to="/" style="text-decoration: none;">
     <div class="c-sidebar-brand-full">
-      VIVISHU<img src="~@/assets/vivishu.png"/>
+      비비슈<img src="~@/assets/vivishu1.png"/>
     </div>
     <div class="c-sidebar-brand-minimized">
-      <img src="~@/assets/vivishu.png"/>
+      <img src="~@/assets/vivishu3.png"/>
     </div>
     </CSidebarBrand>
 
@@ -24,16 +24,36 @@
 
 <script>
 import nav from './_nav'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Sidebar',
   nav,
   computed: {
+    ...mapGetters({
+      isLogin: 'Auth/isLogin',
+      id: 'Auth/id'
+    }),
     show () {
       return this.$store.state.Coreui.sidebarShow
     },
     minimize () {
       return this.$store.state.Coreui.sidebarMinimize
+    }
+  },
+  created () {
+    if (this.id !== 'admin') {
+      this.$options.nav[0]._children.filter((x) => x.type === 99).forEach((e) => {
+        e._attrs = { class: 'sidebar-hide' }
+      })
+    } else {
+      this.$options.nav[0]._children.filter((x) => x.type === 99).forEach((e) => {
+        if (e._name === 'CSidebarNavTitle') {
+          e._attrs = { class: 'c-sidebar-nav-title' }
+        } else if (e._name === 'CSidebarNavItem') {
+          e._attrs = { class: 'c-sidebar-nav-item' }
+        }
+      })
     }
   }
 }
@@ -42,13 +62,17 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 
+.sidebar-hide {
+  display: none;
+}
+
 .c-sidebar {
   background: #F87499;
 }
 
 .c-sidebar-brand-full {
   font-family: 'Lato', sans-serif;
-  font-size: 35px;
+  font-size: 30px;
 }
 
 .c-sidebar-brand-full img {

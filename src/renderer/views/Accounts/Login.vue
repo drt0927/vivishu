@@ -51,7 +51,7 @@ export default {
   data () {
     return {
       db: this.$db.accounts,
-      account: this.$db.accounts.getDocument({ id: 'admin' })
+      account: this.$db.accounts.getDocument({ id: '' })
     }
   },
   computed: {
@@ -112,7 +112,7 @@ export default {
       this.$router.push({ path: '/register' })
     }
 
-    this.$utils.common.getElement(this, 'pwd').focus()
+    this.$utils.common.getElement(this, 'id').focus()
   }
 }
 </script>

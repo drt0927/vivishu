@@ -75,13 +75,13 @@
           </td>
         </template>
         <template #releaseDate="{item}">
-          <td>
+          <td v-c-tooltip="{content: (item.description || ' ')}">
             {{$moment(item.releaseDate).format('YYYY-MM-DD')}}
           </td>
         </template>
         <template #products="{item}">
           <td>
-              <ul class="products-list" v-c-tooltip="{content: item.description}">
+              <ul class="products-list">
                 <li v-for="product in item.products" v-bind:key="product._id">
                   {{product.no}} [ <b>{{product.amount}}</b> - <i>{{product.description}}</i> ]
                 </li>
@@ -176,6 +176,7 @@ export default {
   methods: {
     async find () {
       await this.$db.orders.findForTable(this.table)
+      console.log(this.table)
     },
     getTypeConvert (type) {
       if (type === 1) {
