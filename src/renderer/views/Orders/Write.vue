@@ -125,8 +125,8 @@
         </CDataTable>
       </CCardBody>
       <CCardFooter>
-        <CButton type="submit" size="sm" color="primary" @click="excute">{{id ? '수정' : '추가'}}</CButton>
-        <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
+        <CButton type="button" size="sm" color="secondary" @click="goList">취소</CButton>
+        <CButton type="submit" size="sm" color="primary" class="float-right" @click="excute">{{id ? '수정' : '추가'}}</CButton>
       </CCardFooter>
     </CCard>
     <address-search-modal :show.sync="bind.addressSearchModalShow" @complete="addressSearchComplete"/>

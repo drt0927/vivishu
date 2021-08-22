@@ -45,8 +45,8 @@
         </CForm>
       </CCardBody>
       <CCardFooter>
-        <CButton type="submit" size="sm" color="primary" @click="excute">{{id ? '수정' : '추가'}}</CButton>
-        <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
+        <CButton type="button" size="sm" color="secondary" @click="goList">취소</CButton>
+        <CButton type="submit" size="sm" color="primary" class="float-right" @click="excute">{{id ? '수정' : '추가'}}</CButton>
       </CCardFooter>
     </CCard>
   </div>
@@ -79,7 +79,6 @@ export default {
       if (!this.valid()) {
         return
       }
-      console.log(this.sales)
       let add = await this.db.add(this.sales)
       if (!add.isSuccess) {
         alert('일매출 정보 추가를 실패하였습니다.')

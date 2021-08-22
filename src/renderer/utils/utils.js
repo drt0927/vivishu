@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import enums from './enums'
 
 const common = {
   getElement (vm, ref) {
@@ -70,7 +69,7 @@ const masking = {
 
 const check = {
   phone (str) {
-    var regExp = /(01[0|1|6|9|7])(\d{3}|\d{4})(\d{4}$)/g
+    var regExp = /(01[0|1|6|9|7])-(\d{3}|\d{4})-(\d{4}$)/g
     var result = regExp.exec(str)
     if (!result) {
       return false
@@ -78,7 +77,7 @@ const check = {
     return true
   },
   call (str) {
-    var regExp = /(\d{2}|\d{3})(\d{3}|\d{4})(\d{4}$)/g
+    var regExp = /(\d{2}|\d{3})-(\d{3}|\d{4})-(\d{4}$)/g
     var result = regExp.exec(str)
     if (!result) {
       return false
@@ -277,6 +276,5 @@ export default {
   check,
   crypt,
   structures,
-  enums,
   sweetAlert
 }

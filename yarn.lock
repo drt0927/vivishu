@@ -9287,10 +9287,10 @@ vue-color@^2.8.1:
     material-colors "^1.0.0"
     tinycolor2 "^1.1.2"
 
-vue-daum-postcode@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/vue-daum-postcode/-/vue-daum-postcode-0.10.0.tgz#c2ab59ff56e243550d6ba9b4b33729d1766aa48b"
-  integrity sha512-s0D2IZcs66XUMDZRYhWiWtv9HrnK3WAgd4396rri/h0VKmTttyYSNF6vi62MTyBwWQBswg6jU9hQzGcDYLbWYA==
+vue-daum-postcode@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/vue-daum-postcode/-/vue-daum-postcode-0.9.0.tgz#2982b8946c6c756e1f9faccc4cb8fc7c93b4b117"
+  integrity sha512-9nlPp4MlMyMlpmd0tHBQqzvctZldhaN/uEl+W7nWSQIDHcsUvsFF1oCbzFVpz1fexjPeFrn+rmtPyk8/dthexA==
 
 vue-electron@^1.0.6:
   version "1.0.6"

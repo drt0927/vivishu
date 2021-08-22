@@ -1,6 +1,6 @@
 {
   "name": "vivishu",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "",
   "description": "An electron-vue project",
   "license": "MIT",
@@ -63,7 +63,7 @@
     "v-calendar": "^2.3.0",
     "vue": "^2.5.16",
     "vue-color": "^2.8.1",
-    "vue-daum-postcode": "^0.10.0",
+    "vue-daum-postcode": "0.9.0",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vue-simple-calendar": "^5.0.1",

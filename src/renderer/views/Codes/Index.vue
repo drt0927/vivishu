@@ -110,9 +110,9 @@
       </CForm>
       <template #footer>
         <div style="width: 100%">
-          <CButton type="button" size="sm" color="primary" @click="excute">{{modal.code._id ? '수정' : '추가'}}</CButton>
+          <CButton type="submit" size="sm" color="secondary" @click="modal.show = false">닫기</CButton>
+          <CButton type="button" size="sm" color="primary" class="float-right" @click="excute">{{modal.code._id ? '수정' : '추가'}}</CButton>
           <CButton type="button" v-show="modal.code._id ? true : false" size="sm" color="danger" @click="remove">삭제</CButton>
-          <CButton type="submit" size="sm" color="secondary" class="float-right" @click="modal.show = false">닫기</CButton>
         </div>
       </template>
     </CModal>

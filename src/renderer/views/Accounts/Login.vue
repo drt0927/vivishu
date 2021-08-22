@@ -70,7 +70,6 @@ export default {
       }
 
       let find = await this.db.findOneByQuery({ id: this.account.id, pwd: this.$utils.crypt.encryptSHA512(this.account.pwd) })
-      console.log(find)
       if (!find.isSuccess) {
         this.logout()
         alert(find.result)
@@ -79,6 +78,7 @@ export default {
 
       if (!find.result) {
         this.$utils.sweetAlert.showToast(this, '로그인에 실패하였습니다.\r\n\r\n아이디 혹은 비밀번호를 확인해주세요.', 'error')
+        return
       }
 
       this.login({

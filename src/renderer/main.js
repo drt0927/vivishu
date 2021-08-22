@@ -11,7 +11,6 @@ import FilbertUtils from './plugin/utils'
 import CoreuiVue from '@coreui/vue'
 import { iconsSet as icons } from './assets/icons/icons.js'
 import VueSweetalert2 from 'vue-sweetalert2'
-import VueDaumPostcode from 'vue-daum-postcode'
 import VCalendar from 'v-calendar'
 import moment from 'moment'
 
@@ -26,13 +25,9 @@ Vue.prototype.$moment = moment
 Vue.use(CoreuiVue)
 Vue.use(FilbertUtils)
 Vue.use(VueSweetalert2)
-Vue.use(VueDaumPostcode)
 Vue.use(VCalendar)
 
-// Vue.use(BootstrapVue)
-// Vue.use(IconsPlugin)
 /* eslint-disable no-new */
-console.log(store)
 
 new Vue({
   components: { App },

@@ -1,6 +1,6 @@
 <template>
   <CModal title="주소 검색" :show.sync="isShow">
-    <vue-daum-postcode style="margin-top:25px;" @complete="addressSearchComplete" />
+    <VueDaumPostcode style="margin-top:25px;" @complete="addressSearchComplete" />
     <template #footer>
       <div></div>
     </template>
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { VueDaumPostcode } from 'vue-daum-postcode'
+
 export default {
   name: 'address-search-modal',
   props: {
@@ -22,6 +24,9 @@ export default {
         this.$emit('update:show', val)
       }
     }
+  },
+  components: {
+    VueDaumPostcode
   },
   methods: {
     addressSearchComplete (addr) {

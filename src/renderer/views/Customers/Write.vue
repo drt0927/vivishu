@@ -20,7 +20,8 @@
             description="연락처를 입력해 주세요."
             horizontal
             ref="contact"
-            v-model="customer.contact"
+            v-model.trim="customer.contact"
+            @keyup="contactFormatCheck"
             @keyup.enter="excute"
           />
           <CInput
@@ -58,8 +59,8 @@
         </CForm>
       </CCardBody>
       <CCardFooter>
-        <CButton type="submit" size="sm" color="primary" @click="excute">{{id ? '수정' : '추가'}}</CButton>
-        <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
+        <CButton type="button" size="sm" color="secondary" @click="goList">취소</CButton>
+        <CButton type="submit" size="sm" color="primary" class="float-right" @click="excute">{{id ? '수정' : '추가'}}</CButton>
       </CCardFooter>
     </CCard>
     <address-search-modal :show.sync="modal.show" @complete="addressSearchComplete"/>
@@ -153,6 +154,11 @@ export default {
     },
     addressSearchComplete (addr) {
       this.customer.address = addr
+    },
+    contactFormatCheck () {
+      var str = this.customer.contact.replace(/[^0-9]/g, '')
+      var phone = str.replace(/(^02.{0}|^01.{1}|[0-9]{3})([0-9]+)([0-9]{4})/, '$1-$2-$3')
+      this.customer.contact = phone
     }
   },
   async mounted () {

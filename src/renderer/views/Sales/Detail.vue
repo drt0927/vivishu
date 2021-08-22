@@ -42,10 +42,10 @@
       <CCardFooter>
         <CRow>
           <CCol>
-            <CButton type="submit" size="sm" color="primary" @click="goWrite">수정</CButton>
+            <CButton type="submit" size="sm" color="secondary" @click="goIndex">목록</CButton>
           </CCol>
           <CCol col="2">
-            <CButton type="submit" size="sm" color="secondary" class="float-right" @click="goIndex">목록</CButton>
+            <CButton type="submit" size="sm" color="primary" class="float-right" @click="goWrite">수정</CButton>
           </CCol>
         </CRow>
       </CCardFooter>

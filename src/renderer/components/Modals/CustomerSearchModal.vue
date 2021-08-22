@@ -135,7 +135,6 @@ export default {
       await this.$db.customers.findForTable(this.table)
     },
     selected (item) {
-      console.log(item)
       this.$emit('selected', item._id, item.name, item.address)
       this.isShow = false
     },

@@ -86,8 +86,8 @@
         </CDataTable>
       </CCardBody>
       <CCardFooter>
-        <CButton type="submit" size="sm" color="primary" @click="add">추가</CButton>
-        <CButton type="button" size="sm" color="secondary" class="float-right" @click="goList">취소</CButton>
+        <CButton type="button" size="sm" color="secondary" @click="goList">취소</CButton>
+        <CButton type="submit" size="sm" color="primary" class="float-right" @click="add">추가</CButton>
       </CCardFooter>
     </CCard>
     <store-search-modal :show.sync="bind.storeSearchModalShow" @selected="storeSearchSelected"/>

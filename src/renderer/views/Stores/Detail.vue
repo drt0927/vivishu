@@ -48,11 +48,11 @@
       <CCardFooter>
         <CRow>
           <CCol>
-            <CButton type="submit" size="sm" color="primary" @click="goEdit">수정</CButton>
-            <CButton type="button" size="sm" color="info" @click="goTradeWrite">수평이동 추가</CButton>
+            <CButton type="submit" size="sm" color="secondary" @click="goIndex">목록</CButton>
           </CCol>
-          <CCol col="2">
-            <CButton type="submit" size="sm" color="secondary" class="float-right" @click="goIndex">목록</CButton>
+          <CCol>
+            <CButton type="submit" size="sm" color="primary" class="float-right" @click="goEdit">수정</CButton>
+            <CButton type="button" size="sm" color="info" class="float-right" style="margin-right: 10px;" @click="goTradeWrite">수평이동 추가</CButton>
           </CCol>
         </CRow>
       </CCardFooter>

@@ -5,7 +5,6 @@ import path from 'path'
 import { remote } from 'electron'
 import utils from '../utils/utils'
 import cloneDeep from 'lodash.clonedeep'
-// import enums from '../utils/enums'
 
 const dbFactory = file => {
   return new Datastore({
@@ -271,9 +270,6 @@ export default class NedbHelper {
    */
   async count (query) {
     return new Promise(resolve => {
-      // if (!query) {
-      //   resolve(this.getResult('개수 조회 쿼리가 비어있습니다.', 0))
-      // }
       this.db.count(query, (err, count) => {
         resolve(this.getResult(err, count))
       })

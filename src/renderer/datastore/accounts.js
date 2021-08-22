@@ -1,5 +1,4 @@
 import NedbHelper from './nedbHelper'
-// import utils from '../utils/utils'
 
 class Account extends NedbHelper {
   constructor () {

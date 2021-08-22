@@ -5,9 +5,9 @@
         <CIcon name="cil-justify-center"/><strong> Todo </strong><small>할 일 목록</small>
         <div class="card-header-actions">
           <CButtonGroup size="sm">
-            <CButton color="dark" :variant="allButtonVariant" v-c-tooltip="'전체'" @click="setCompleted('')"><CIcon name="cil-justify-center"/> 전체</CButton>
-            <CButton color="success" :variant="activeButtonVariant" v-c-tooltip="'미완료'" @click="setCompleted(false)"><CIcon name="cil-sad"/> 미완료</CButton>
-            <CButton color="info" :variant="completedButtonVariant" v-c-tooltip="'완료'" @click="setCompleted(true)"><CIcon name="cil-smile"/> 완료</CButton>
+            <CButton color="dark" :variant="allButtonVariant" v-c-tooltip="'전체'" @click="setCompleted('')">📋 전체</CButton>
+            <CButton color="success" :variant="activeButtonVariant" v-c-tooltip="'미완료'" @click="setCompleted(false)">😥 미완료</CButton>
+            <CButton color="info" :variant="completedButtonVariant" v-c-tooltip="'완료'" @click="setCompleted(true)">😃 완료</CButton>
           </CButtonGroup>
         </div>
       </CCardHeader>

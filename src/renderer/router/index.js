@@ -226,19 +226,6 @@ export default new Router({
           ]
         }
       ]
-      // component: require('@/components/Layouts/Default').default
-      // children: [
-      //   {
-      //     path: '/',
-      //     name: 'dashboard',
-      //     component: require('@/components/Views/Dashboard').default
-      //   },
-      //   {
-      //     path: '/board',
-      //     name: 'board',
-      //     component: require('@/components/Views/Board').default
-      //   }
-      // ]
     },
     {
       path: '/login',
