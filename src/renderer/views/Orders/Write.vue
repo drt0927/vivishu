@@ -149,12 +149,14 @@ export default {
         type: [
           { value: 1, label: '매장' },
           { value: 2, label: '네이버' },
-          { value: 3, label: '롯데' }
+          { value: 3, label: '롯데' },
+          { value: 4, label: '수선' }
         ],
         deliveryCompany: [
           { value: 0, label: '기타' },
           { value: 1, label: '롯데' },
-          { value: 2, label: '로젠' }
+          { value: 2, label: '로젠' },
+          { value: 3, label: '한진' }
         ],
         addressSearchModalShow: false,
         customerSearchModalShow: false
@@ -250,11 +252,11 @@ export default {
         return false
       }
 
-      if (!this.order.address) {
-        alert(`[주소]은(는) 필수 값 입니다.`)
-        this.$utils.common.getElement(this, 'address').focus()
-        return false
-      }
+      // if (!this.order.address) {
+      //   alert(`[주소]은(는) 필수 값 입니다.`)
+      //   this.$utils.common.getElement(this, 'address').focus()
+      //   return false
+      // }
 
       if (this.order.products.length < 1) {
         alert(`[상품]은(는) 필수 값 입니다.\r\n1개 이상의 상품을 등록해 주세요.`)

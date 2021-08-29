@@ -15,6 +15,12 @@
           v-model="order.name"
         />
         <CInput
+          label="연락처"
+          horizontal
+          disabled
+          v-model="customer.contact"
+        />
+        <CInput
           label="주소 *"
           horizontal
           disabled
@@ -129,6 +135,7 @@ export default {
         ]
       },
       order: {},
+      customer: {},
       productsFields: [
         { key: 'no', label: '품번' },
         { key: 'amount', label: '수량' },
@@ -163,8 +170,13 @@ export default {
       alert('상세 내용을 찾을 수 없습니다.')
       this.goIndex()
     }
-
     this.order = find.result
+
+    let customerFind = await this.$db.customers.findOne(this.order.customerId)
+    if (!find.isSuccess) {
+      console.log('고객 정보를 찾을 수 없습니다.')
+    }
+    this.customer = customerFind.result
   }
 }
 </script>

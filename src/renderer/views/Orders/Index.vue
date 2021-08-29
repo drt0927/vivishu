@@ -71,12 +71,12 @@
         </template>
         <template #type="{item}">
           <td>
-            <h5><CBadge :style="getTypeConvert(item.type).style" >{{getTypeConvert(item.type).lable}}</CBadge></h5>
+            <h5><CBadge :style="getTypeConvert(item.type).style" >{{getTypeConvert(item.type).label}}</CBadge></h5>
           </td>
         </template>
         <template #releaseDate="{item}">
           <td v-c-tooltip="{content: (item.description || ' ')}">
-            {{$moment(item.releaseDate).format('YYYY-MM-DD')}}
+            {{item.releaseDate ? $moment(item.releaseDate).format('YYYY-MM-DD') : ''}}
           </td>
         </template>
         <template #products="{item}">
@@ -86,6 +86,18 @@
                   {{product.no}} [ <b>{{product.amount}}</b> - <i>{{product.description}}</i> ]
                 </li>
               </ul>
+          </td>
+        </template>
+        <template #delivery="{item}">
+          <td v-c-tooltip="{content: (item.deliveryNo || ' ')}">
+            <span v-if="!item.deliveryNo || item.deliveryCompany === 0">
+              {{getDeliveryCode(item.deliveryCompany).label}}
+            </span>
+            <a v-else
+            :href="'https://tracker.delivery/#/' + getDeliveryCode(item.deliveryCompany).code + '/' + item.deliveryNo"
+            target="_blank">
+              {{getDeliveryCode(item.deliveryCompany).label}}
+            </a>
           </td>
         </template>
         <template #btnDetail="{item}">
@@ -127,7 +139,8 @@ export default {
           { value: '', label: '전체' },
           { value: 1, label: '매장' },
           { value: 2, label: '네이버' },
-          { value: 3, label: '롯데' }
+          { value: 3, label: '롯데' },
+          { value: 4, label: '수선' }
         ],
         isCollapsed: true
       },
@@ -136,14 +149,18 @@ export default {
         fields: [
           { key: 'createDate', label: '작성일', _style: 'width: 100px;' },
           { key: 'name', label: '주문자명', _style: 'width: 100px;' },
+          { key: 'products', label: '품번' },
           { key: 'type', label: '구분' },
           { key: 'releaseDate', label: '출고일', _style: 'width: 100px;' },
-          { key: 'products', label: '품번' },
+          { key: 'delivery', label: '배송' },
           { key: 'btnDetail', label: '상세' }
         ],
         currentPage: 1,
         perPage: 15,
         totalPages: 0,
+        sort: {
+          createDate: -1
+        },
         search: {
           name: '',
           type: '',
@@ -178,27 +195,51 @@ export default {
       await this.$db.orders.findForTable(this.table)
     },
     getTypeConvert (type) {
-      if (type === 1) {
-        return {
-          lable: '매장',
-          style: 'background-color: #ccc;'
-        }
-      } else if (type === 2) {
-        return {
-          lable: '네이버',
-          style: 'background-color: #19CE60; color: white;'
-        }
-      } else if (type === 3) {
-        return {
-          lable: '롯데',
-          style: 'background-color: #E30613; color: white;'
-        }
-      } else {
-        return {
-          lable: '',
-          style: ''
-        }
+      let typeObj = {
+        label: '',
+        style: ''
       }
+
+      if (type === 1) {
+        typeObj.label = '매장'
+        typeObj.style = 'background-color: #ccc;'
+      } else if (type === 2) {
+        typeObj.label = '네이버'
+        typeObj.style = 'background-color: #19CE60; color: white;'
+      } else if (type === 3) {
+        typeObj.label = '롯데'
+        typeObj.style = 'background-color: #E30613; color: white;'
+      } else if (type === 4) {
+        typeObj.label = '수선'
+        typeObj.style = 'background-color: #4285F4; color: white;'
+      } else {
+        typeObj.label = ''
+        typeObj.style = ''
+      }
+
+      return typeObj
+    },
+    getDeliveryCode (company) {
+      let delivery = {
+        label: '',
+        code: ''
+      }
+
+      if (company === 1) {
+        delivery.label = '롯데'
+        delivery.code = 'kr.lotte'
+      } else if (company === 2) {
+        delivery.label = '로젠'
+        delivery.code = 'kr.logen'
+      } else if (company === 3) {
+        delivery.label = '한진'
+        delivery.code = 'kr.hanjin'
+      } else {
+        delivery.label = '기타'
+        delivery.code = ''
+      }
+
+      return delivery
     },
     goWrite () {
       this.$router.push({ path: '/orders/write' })

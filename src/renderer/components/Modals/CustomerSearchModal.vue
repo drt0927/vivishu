@@ -17,7 +17,7 @@
                 <CInput
                   label="이름"
                   placeholder="이름을 입력해 주세요. [like]"
-                  v-model="table.search.name.value"
+                  v-model="table.search.name"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -25,7 +25,7 @@
                 <CInput
                   label="연락처"
                   placeholder="연락처를 입력해 주세요. [equal]"
-                  v-model="table.search.contact.value"
+                  v-model="table.search.contact"
                   @keyup.enter="find"
                 />
               </CCol>
@@ -34,7 +34,7 @@
               <CCol sm="6">
                 <CSelect
                   label="행사 알림"
-                  :value.sync="table.search.isEventAlarm.value"
+                  :value.sync="table.search.isEventAlarm"
                   :options="bind.isEventAlarmOptions"
                   @keyup.enter="find"
                 />
@@ -43,7 +43,7 @@
                 <CInput
                   label="설명"
                   placeholder="설명을 입력해 주세요. [like]"
-                  v-model="table.search.description.value"
+                  v-model="table.search.description"
                   @keyup.enter="find"
                 />
               </CCol>
